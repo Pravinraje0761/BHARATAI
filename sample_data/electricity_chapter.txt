@@ -1,0 +1,43 @@
+Chapter 4: Electricity
+
+Section 1 - Electric Current
+Electric current is the rate of flow of electric charge through a conductor. When
+the ends of a conductor are connected to a battery, the free electrons drift in a
+particular direction, and this ordered motion of charge constitutes an electric
+current. Current is measured in amperes (A). One ampere equals one coulomb of
+charge passing a point in one second. By convention the direction of current is
+taken to be the direction of flow of positive charge, which is opposite to the
+direction in which electrons actually move.
+
+Section 2 - Potential Difference (Voltage)
+To make charge flow through a conductor, work must be done on it. The potential
+difference, or voltage, between two points is the work done to move a unit charge
+from one point to the other. Voltage is measured in volts (V). A battery
+maintains a potential difference across its terminals and therefore acts like a
+pump that keeps the charges moving around the circuit. Without a potential
+difference there is no sustained current.
+
+Section 3 - Resistance
+Resistance is the opposition that a conductor offers to the flow of current. It
+arises because the moving electrons collide with the atoms of the conductor and
+lose energy. Resistance is measured in ohms. A thin wire has more resistance than
+a thick wire of the same material and length, and a long wire has more resistance
+than a short one. Resistance also increases with temperature for most metals.
+
+Section 4 - Ohm's Law
+Ohm's law states that, at constant temperature, the current through a conductor
+is directly proportional to the potential difference across it and inversely
+proportional to its resistance. In symbols, V = I x R, where V is the voltage, I
+is the current, and R is the resistance. This means that if the voltage across a
+fixed resistor is doubled, the current doubles. If instead the voltage is held
+constant and the resistance is increased, the current decreases. For example, a
+12 V battery connected across a 4 ohm resistor drives a current of 3 A; replacing
+it with a 6 ohm resistor at the same 12 V reduces the current to 2 A.
+
+Section 5 - Series and Parallel Circuits
+When resistors are connected in series, the same current flows through each and
+the total resistance is the sum of the individual resistances. When resistors are
+connected in parallel, the voltage across each is the same and the total
+resistance is less than the smallest individual resistance. Household wiring uses
+parallel connections so that each appliance gets the full supply voltage and can
+be switched independently.

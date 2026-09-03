@@ -1,0 +1,169 @@
+/* Bharat Academix Styles - Minimalist-Glassmorphic India-Modern Theme */
+
+:root {
+  --primary: #002045;
+  --on-primary: #ffffff;
+  --primary-container: #1a365d;
+  --on-primary-container: #86a0cd;
+  --secondary: #8f4e00;
+  --secondary-container: #fe9832;
+  --on-secondary-container: #683700;
+  --tertiary: #002617;
+  --tertiary-container: #003e29;
+  --on-tertiary-container: #6eab8c;
+  --surface: #f8f9ff;
+  --surface-container-low: #eff4ff;
+  --surface-container: #e5eeff;
+  --surface-container-high: #dce9ff;
+  --on-surface: #0b1c30;
+  --on-surface-variant: #43474e;
+  --outline-variant: #c4c6cf;
+  --error: #ba1a1a;
+  --error-container: #ffdad6;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--surface);
+  color: var(--on-surface);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, .font-headline {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.font-mono, .font-label-md, .citation-badge {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Glassmorphism Classes */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(196, 198, 207, 0.35);
+}
+
+.glass-nav {
+  background: rgba(248, 249, 255, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(196, 198, 207, 0.3);
+}
+
+.glass-card {
+  background: #ffffff;
+  border: 1px solid rgba(220, 233, 255, 0.8);
+  box-shadow: 0 4px 20px -2px rgba(11, 28, 48, 0.04);
+}
+
+.glass-card:hover {
+  border-color: rgba(26, 54, 93, 0.3);
+  box-shadow: 0 8px 28px -4px rgba(11, 28, 48, 0.08);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(116, 119, 127, 0.25);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(116, 119, 127, 0.45);
+}
+
+/* Animation utilities */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(254, 152, 50, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(254, 152, 50, 0.65);
+  }
+}
+
+.glow-adaptive {
+  animation: pulseGlow 2.5s infinite ease-in-out;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+/* Accessibility Layer */
+body.font-dyslexic, body.font-dyslexic * {
+  font-family: 'OpenDyslexic', 'Comic Sans MS', sans-serif !important;
+  letter-spacing: 0.05em;
+  word-spacing: 0.1em;
+}
+
+body.high-contrast {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+body.high-contrast .bg-surface,
+body.high-contrast .bg-surface-container-low,
+body.high-contrast .bg-surface-container {
+  background-color: #ffffff !important;
+  border-color: #000000 !important;
+  color: #000000 !important;
+}
+
+body.high-contrast .text-on-surface-variant {
+  color: #1a1a1a !important;
+}
+
+/* State machine pulse */
+.state-active {
+  background: var(--primary-container) !important;
+  color: var(--on-primary-container) !important;
+  font-weight: 600;
+  box-shadow: 0 2px 10px rgba(0, 32, 69, 0.15);
+  transform: scale(1.02);
+}
+
+.state-completed {
+  color: #0e5138;
+}
+
+/* Drag and Drop Zone */
+.dropzone-active {
+  border-color: var(--secondary) !important;
+  background-color: rgba(254, 152, 50, 0.08) !important;
+}
+
+/* Video wrapper */
+.video-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: #0b1c30;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 12px 36px -6px rgba(0, 32, 69, 0.2);
+}
+
+.video-container video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
