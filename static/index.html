@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>BHARATGURU — Adaptive Multilingual AI Learning System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&family=OpenDyslexic&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#002045",
+            "on-primary": "#ffffff",
+            "primary-container": "#1a365d",
+            "on-primary-container": "#86a0cd",
+            "primary-fixed": "#d6e3ff",
+            "secondary": "#8f4e00",
+            "on-secondary": "#ffffff",
+            "secondary-container": "#fe9832",
+            "on-secondary-container": "#683700",
+            "tertiary": "#002617",
+            "on-tertiary": "#ffffff",
+            "tertiary-container": "#003e29",
+            "surface": "#f8f9ff",
+            "surface-dim": "#cbdbf5",
+            "surface-bright": "#f8f9ff",
+            "surface-container-low": "#eff4ff",
+            "surface-container": "#e5eeff",
+            "surface-container-high": "#dce9ff",
+            "on-surface": "#0b1c30",
+            "on-surface-variant": "#43474e",
+            "outline": "#74777f",
+            "outline-variant": "#c4c6cf",
+            "error": "#ba1a1a",
+            "error-container": "#ffdad6"
+          },
+          fontFamily: {
+            "display-lg": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "body-lg": ["Inter"],
+            "body-md": ["Inter"],
+            "label-md": ["JetBrains Mono"],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/styles.css"/>
+</head>
+<body class="bg-surface font-body-md text-on-surface antialiased transition-colors duration-200">
+
+  <!-- ======================== LEFT SIDEBAR: PEDAGOGY LOOP & ARCHITECTURE ======================== -->
+  <aside class="fixed left-0 top-0 h-full w-[280px] bg-surface-container-low z-50 flex flex-col pt-20 pb-6 border-r border-outline-variant/30">
+    <div class="px-6 mb-4">
+      <h3 class="font-label-md text-[11px] uppercase tracking-widest text-on-surface-variant/70 font-semibold">Pedagogy State Machine</h3>
+      <p class="text-[12px] text-on-surface-variant mt-0.5">Understand &bull; Adapt &bull; Verify</p>
+    </div>
+    
+    <nav class="flex-1 px-3 space-y-1.5 overflow-y-auto">
+      <a class="flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 group" data-path="understand" href="#">
+        <span class="material-symbols-outlined mr-3 text-[20px] group-hover:scale-110 transition-transform text-primary">psychology</span>
+        <span class="font-headline-md text-[14px]">1. Understand</span>
+      </a>
+      <a class="flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 group" data-path="plan" href="#">
+        <span class="material-symbols-outlined mr-3 text-[20px] group-hover:scale-110 transition-transform text-primary">account_tree</span>
+        <span class="font-headline-md text-[14px]">2. Plan & Ground</span>
+      </a>
+      <a class="flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 group" data-path="explain" href="#">
+        <span class="material-symbols-outlined mr-3 text-[20px] group-hover:scale-110 transition-transform text-primary">record_voice_over</span>
+        <span class="font-headline-md text-[14px]">3. Explain (Bharat Context)</span>
+      </a>
+      <a class="flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 group" data-path="question" href="#">
+        <span class="material-symbols-outlined mr-3 text-[20px] group-hover:scale-110 transition-transform text-primary">quiz</span>
+        <span class="font-headline-md text-[14px]">4. Question / Socratic</span>
+      </a>
+      <a class="flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 group" data-path="evaluate" href="#">
+        <span class="material-symbols-outlined mr-3 text-[20px] group-hover:scale-110 transition-transform text-secondary">fingerprint</span>
+        <span class="font-headline-md text-[14px]">5. Fingerprint Error</span>
+      </a>
+      <a class="flex items-center px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all duration-200 group" data-path="adapt" href="#">
+        <span class="material-symbols-outlined mr-3 text-[20px] group-hover:scale-110 transition-transform text-secondary">auto_fix_high</span>
+        <span class="font-headline-md text-[14px]">6. Adapt Pedagogy</span>
+      </a>
+    </nav>
+
+    <!-- System Badges in Sidebar -->
+    <div class="px-4 pt-4 border-t border-outline-variant/30 space-y-2">
+      <div class="p-3 rounded-xl bg-surface border border-outline-variant/30 text-[11px] space-y-1">
+        <div class="flex items-center justify-between text-on-surface font-semibold">
+          <span>Misconception Engine™</span>
+          <span class="w-2 h-2 rounded-full bg-secondary-container animate-pulse"></span>
+        </div>
+        <p class="text-on-surface-variant font-mono text-[10px]">Active Cognitive Diagnosis</p>
+      </div>
+      <div class="p-3 rounded-xl bg-surface border border-outline-variant/30 text-[11px] space-y-1">
+        <div class="flex items-center justify-between text-on-surface font-semibold">
+          <span>Hallucination Shield</span>
+          <span class="w-2 h-2 rounded-full bg-tertiary-container"></span>
+        </div>
+        <p class="text-on-surface-variant font-mono text-[10px]">Claim-Level Citation Guard</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ======================== MAIN CONTAINER ======================== -->
+  <div class="pl-[280px]">
+    
+    <!-- TOP HEADER WITH ACCESSIBILITY TOOLBAR & NAVIGATION -->
+    <header class="fixed top-0 left-0 right-0 h-20 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-[60] flex items-center justify-between px-8 border-b border-outline-variant/30">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-container flex items-center justify-center text-on-primary font-headline-lg font-bold shadow-sm">
+          <span class="material-symbols-outlined text-[24px]">school</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-headline-md text-[20px] text-primary font-bold tracking-tight">BHARATGURU</span>
+            <span class="bg-secondary/10 text-secondary text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-secondary/20">v2.0</span>
+          </div>
+          <span class="block text-[11px] font-mono text-on-surface-variant">Multilingual Adaptive AI Learning System</span>
+        </div>
+      </div>
+      
+      <!-- Center Navigation Tabs -->
+      <nav class="hidden lg:flex items-center gap-5">
+        <a class="nav-tab text-[14px] text-on-surface-variant hover:text-primary transition-colors pb-1" data-target="view-upload-material" href="#">Upload & Plan</a>
+        <a class="nav-tab text-[14px] text-on-surface-variant hover:text-primary transition-colors pb-1" data-target="view-live-classroom" href="#">Classroom (Live)</a>
+        <a class="nav-tab text-[14px] text-secondary font-bold hover:text-primary transition-colors pb-1 flex items-center gap-1" data-target="view-3d-lab" href="#">
+          <span class="material-symbols-outlined text-[16px]">view_in_ar</span>
+          3D Lab
+        </a>
+        <a class="nav-tab text-[14px] text-primary font-bold border-b-2 border-primary pb-1" data-target="view-knowledge-graph" href="#">Knowledge Graph</a>
+        <a class="nav-tab text-[14px] text-on-surface-variant hover:text-primary transition-colors pb-1" data-target="view-learning-dna" href="#">Learning DNA</a>
+        <a class="nav-tab text-[14px] text-on-surface-variant hover:text-primary transition-colors pb-1" data-target="view-spaced-repetition" href="#">Spaced Repetition</a>
+        <a class="nav-tab text-[14px] text-on-surface-variant hover:text-primary transition-colors pb-1" data-target="view-teacher-dashboard" href="#">Teacher Dashboard</a>
+      </nav>
+      
+      <!-- Accessibility Toolbar & Student Profile -->
+      <div class="flex items-center gap-3">
+        <!-- Accessibility Dropdown / Toggles -->
+        <div class="flex items-center gap-1.5 bg-surface-container px-2 py-1 rounded-xl border border-outline-variant/40 text-[12px]">
+          <button id="btn-toggle-dyslexia" title="Toggle Dyslexia-friendly font" class="p-1 rounded-lg hover:bg-surface text-on-surface-variant hover:text-primary transition-colors">
+            <span class="material-symbols-outlined text-[18px]">text_fields</span>
+          </button>
+          <button id="btn-toggle-contrast" title="Toggle High Contrast" class="p-1 rounded-lg hover:bg-surface text-on-surface-variant hover:text-primary transition-colors">
+            <span class="material-symbols-outlined text-[18px]">contrast</span>
+          </button>
+          <select id="select-speech-rate" title="Audio Pace" class="bg-transparent text-[11px] font-mono text-on-surface focus:outline-none cursor-pointer">
+            <option value="0.85">0.85x</option>
+            <option value="1.0" selected>1.0x</option>
+            <option value="1.2">1.2x</option>
+          </select>
+        </div>
+
+        <span class="text-[12px] font-mono bg-primary/10 text-primary px-3 py-1.5 rounded-full font-semibold">Student: <strong>student1</strong></span>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="relative pt-24 min-h-screen bg-surface px-8 pb-16">
+
+      <!-- ==================== VIEW 1: UPLOAD MATERIAL, "TEACH ME LIKE...", CONFIGURE ==================== -->
+      <section id="view-upload-material" class="hidden max-w-5xl mx-auto space-y-8 animate-fade-in">
+        
+        <div class="space-y-2 mt-2">
+          <h1 class="font-display-lg text-[32px] font-bold text-on-surface">What shall we learn today?</h1>
+          <p class="text-on-surface-variant text-[15px]">Upload your textbook notes, select your favorite teaching lens, or enter any syllabus topic to build your personalized Bharat learning plan.</p>
+        </div>
+
+        <!-- "TEACH ME LIKE..." PRESET ACCELERATOR BAR -->
+        <div class="bg-gradient-to-r from-primary-container/10 via-secondary-container/10 to-primary-container/10 p-5 rounded-2xl border border-outline-variant/40 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-headline-md text-[14px] font-bold text-primary flex items-center gap-2">
+              <span class="material-symbols-outlined text-secondary text-[20px]">bolt</span>
+              "Teach Me Like..." Style Presets
+            </span>
+            <span class="text-[11px] font-mono text-on-surface-variant">1-Click Pedagogical Shift</span>
+          </div>
+
+          <div class="flex flex-wrap gap-2.5" id="presets-container">
+            <button class="preset-btn px-3.5 py-1.5 rounded-xl border border-primary/20 bg-surface hover:bg-primary hover:text-on-primary text-[12px] font-medium transition-all shadow-sm" data-preset="ten_year_old">
+              👶 Like I'm 10
+            </button>
+            <button class="preset-btn px-3.5 py-1.5 rounded-xl border border-secondary/30 bg-surface hover:bg-secondary hover:text-on-secondary text-[12px] font-medium transition-all shadow-sm" data-preset="cricket">
+              🏏 Using Cricket
+            </button>
+            <button class="preset-btn px-3.5 py-1.5 rounded-xl border border-primary/20 bg-surface hover:bg-primary hover:text-on-primary text-[12px] font-medium transition-all shadow-sm" data-preset="professor">
+              🎓 Like My Professor
+            </button>
+            <button class="preset-btn px-3.5 py-1.5 rounded-xl border border-primary/20 bg-surface hover:bg-primary hover:text-on-primary text-[12px] font-medium transition-all shadow-sm" data-preset="bilingual_tamil">
+              🇮🇳 Tanglish (Tamil + Eng)
+            </button>
+            <button class="preset-btn px-3.5 py-1.5 rounded-xl border border-secondary/30 bg-surface hover:bg-secondary hover:text-on-secondary text-[12px] font-medium transition-all shadow-sm" data-preset="five_min">
+              ⚡ 5-Minute Blitz
+            </button>
+            <button class="preset-btn px-3.5 py-1.5 rounded-xl border border-primary/20 bg-surface hover:bg-primary hover:text-on-primary text-[12px] font-medium transition-all shadow-sm" data-preset="socratic">
+              🏛️ Socratic Guide
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          
+          <!-- Dropzone Card -->
+          <div class="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/30 space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-headline-md text-[17px] font-semibold text-on-surface flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">upload_file</span>
+                Upload Study Material (PDF / DOCX / PPTX / TXT)
+              </h3>
+            </div>
+            
+            <div id="dropzone" class="border-2 border-dashed border-outline-variant rounded-2xl p-7 text-center cursor-pointer hover:border-primary hover:bg-surface transition-all flex flex-col items-center justify-center space-y-2">
+              <span class="material-symbols-outlined text-[44px] text-primary/70">cloud_upload</span>
+              <p class="font-body-md font-semibold text-on-surface text-[14px]">Drag and drop notes or syllabus here</p>
+              <p class="text-[12px] text-on-surface-variant">or click to browse local files</p>
+              <input id="file-input" type="file" multiple accept=".pdf,.docx,.pptx,.txt,.md" class="hidden" />
+            </div>
+
+            <div id="uploaded-files-list" class="space-y-2"></div>
+
+            <div class="pt-2 flex items-center justify-between">
+              <span class="text-[12px] text-on-surface-variant font-mono">Demo Accelerator:</span>
+              <button id="btn-load-sample" class="text-[12px] font-mono text-secondary hover:underline flex items-center gap-1 font-semibold">
+                <span class="material-symbols-outlined text-[16px]">bolt</span>
+                Load Sample Electricity Chapter
+              </button>
+            </div>
+          </div>
+
+          <!-- Configuration Card -->
+          <div class="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/30 space-y-4">
+            <h3 class="font-headline-md text-[17px] font-semibold text-on-surface flex items-center gap-2">
+              <span class="material-symbols-outlined text-secondary">tune</span>
+              Personalization & Bharat Parameters
+            </h3>
+
+            <div class="space-y-1">
+              <label class="font-label-md text-[11px] text-on-surface-variant uppercase font-semibold">Topic / Concept</label>
+              <input id="topic-input" type="text" placeholder="e.g. Chapter 4: Electricity or Newton's Laws of Motion" class="w-full bg-surface border border-outline-variant rounded-xl px-4 py-2 text-on-surface focus:border-primary focus:outline-none text-[14px]" />
+            </div>
+
+            <div class="space-y-1">
+              <label class="font-label-md text-[11px] text-on-surface-variant uppercase font-semibold">Instruction / Goal</label>
+              <textarea id="instruction-input" rows="2" class="w-full bg-surface border border-outline-variant rounded-xl px-4 py-2 text-on-surface focus:border-primary focus:outline-none text-[13px]">I am a beginner, teach me in 20 minutes, in English, with simple real-world examples</textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <!-- Teaching Mode -->
+              <div class="space-y-1">
+                <label class="font-label-md text-[11px] text-on-surface-variant uppercase font-semibold">Teaching Mode</label>
+                <select id="select-teaching-mode" class="w-full bg-surface border border-outline-variant rounded-xl px-3 py-1.5 text-on-surface font-mono text-[12px]">
+                  <option value="DIRECT" selected>DIRECT (Balanced)</option>
+                  <option value="SOCRATIC">SOCRATIC (Question-Led)</option>
+                  <option value="EXAM">EXAM (CBSE / JEE Mode)</option>
+                  <option value="REVISION">REVISION (Fast Polish)</option>
+                  <option value="BEGINNER">BEGINNER (Intuitive)</option>
+                  <option value="DEEP DIVE">DEEP DIVE (Math Rigor)</option>
+                </select>
+              </div>
+
+              <!-- 12 Indian Languages -->
+              <div class="space-y-1">
+                <label class="font-label-md text-[11px] text-on-surface-variant uppercase font-semibold">Language (12 Indic)</label>
+                <select id="select-language" class="w-full bg-surface border border-outline-variant rounded-xl px-3 py-1.5 text-on-surface font-mono text-[12px]">
+                  <option value="English" selected>English</option>
+                  <option value="Hindi">Hindi (हिन्दी)</option>
+                  <option value="Hinglish">Hinglish (Latin)</option>
+                  <option value="Tamil">Tamil (தமிழ்)</option>
+                  <option value="Telugu">Telugu (తెలుగు)</option>
+                  <option value="Kannada">Kannada (ಕನ್ನಡ)</option>
+                  <option value="Malayalam">Malayalam (മലയാളം)</option>
+                  <option value="Bengali">Bengali (বাংলা)</option>
+                  <option value="Marathi">Marathi (मराठी)</option>
+                  <option value="Gujarati">Gujarati (ગુજરાતી)</option>
+                  <option value="Punjabi">Punjabi (ਪੰਜਾਬੀ)</option>
+                  <option value="Odia">Odia (ଓଡ଼ିଆ)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div class="space-y-1">
+                <label class="font-label-md text-[11px] text-on-surface-variant uppercase font-semibold">Exam Syllabus</label>
+                <select id="select-exam-board" class="w-full bg-surface border border-outline-variant rounded-xl px-3 py-1.5 text-on-surface font-mono text-[12px]">
+                  <option value="CBSE Class 10/12" selected>CBSE Board</option>
+                  <option value="JEE Main & Advanced">JEE Main / Adv</option>
+                  <option value="NEET-UG">NEET-UG</option>
+                  <option value="ICSE / ISC">ICSE / ISC</option>
+                  <option value="State Board">State Board</option>
+                  <option value="Custom Syllabus">Custom Syllabus</option>
+                </select>
+              </div>
+
+              <div class="space-y-1">
+                <label class="font-label-md text-[11px] text-on-surface-variant uppercase font-semibold">Duration Template</label>
+                <select id="select-duration" class="w-full bg-surface border border-outline-variant rounded-xl px-3 py-1.5 text-on-surface font-mono text-[12px]">
+                  <option value="5">5 min (3 Segments)</option>
+                  <option value="20" selected>20 min (5 Segments)</option>
+                  <option value="60">60 min (9 Segments)</option>
+                </select>
+              </div>
+            </div>
+
+            <button id="btn-build-lesson" class="w-full bg-primary text-on-primary font-headline-md font-bold py-3 px-6 rounded-xl hover:scale-[1.01] transition-all shadow-md flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined">auto_awesome</span>
+              Build Adaptive Lesson Plan
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== VIEW 2: LESSON PLAN PREVIEW ==================== -->
+      <section id="view-lesson-plan" class="hidden max-w-5xl mx-auto space-y-6 animate-fade-in">
+        <div class="flex items-center justify-between mt-2">
+          <div>
+            <h1 id="plan-title" class="font-display-lg text-[30px] font-bold text-on-surface">Lesson Plan</h1>
+            <div id="plan-meta" class="flex flex-wrap gap-2 mt-1.5"></div>
+          </div>
+          <button id="btn-start-classroom" class="bg-secondary text-on-secondary font-headline-md font-bold py-2.5 px-6 rounded-xl hover:scale-105 transition-transform shadow-md flex items-center gap-2">
+            <span class="material-symbols-outlined">play_circle</span>
+            Enter Interactive Classroom
+          </button>
+        </div>
+
+        <div id="plan-segments-list" class="space-y-3.5"></div>
+      </section>
+
+      <!-- ==================== VIEW 3: LIVE CLASSROOM WITH VOICE & MISCONCEPTION ENGINE ==================== -->
+      <section id="view-live-classroom" class="hidden max-w-6xl mx-auto space-y-6 animate-fade-in">
+        
+        <!-- Header Bar with Segment info & Mid-Lesson Language Switcher -->
+        <div class="flex flex-wrap items-center justify-between gap-4 bg-surface-container-low p-4 rounded-2xl border border-outline-variant/30 shadow-sm">
+          <div>
+            <span id="classroom-segment-badge" class="font-mono text-[12px] bg-primary-container text-on-primary-container px-2.5 py-1 rounded-full font-semibold">Segment 1</span>
+            <h2 id="classroom-concept-title" class="font-headline-md text-[19px] font-bold text-on-surface mt-1">Concept</h2>
+          </div>
+
+          <!-- Classroom Actions & Language Switcher -->
+          <div class="flex items-center gap-3">
+            <button id="btn-open-3d-from-classroom" class="px-3 py-1.5 rounded-xl bg-secondary/10 hover:bg-secondary hover:text-on-secondary text-secondary border border-secondary/20 text-[12px] font-mono font-bold flex items-center gap-1.5 transition-all shadow-sm">
+              <span class="material-symbols-outlined text-[16px]">view_in_ar</span>
+              Inspect in 3D Lab
+            </button>
+
+            <!-- Mid-Lesson Language Switcher Pills -->
+            <div class="flex items-center gap-2">
+              <span class="text-[12px] font-mono text-on-surface-variant font-medium">Language:</span>
+              <div class="flex items-center gap-1.5 bg-surface p-1 rounded-xl border border-outline-variant/30">
+                <button class="lang-switch-btn px-2.5 py-1 rounded-lg text-[12px] font-mono font-semibold hover:bg-primary-container transition-colors" data-lang="English">EN</button>
+                <button class="lang-switch-btn px-2.5 py-1 rounded-lg text-[12px] font-mono font-semibold hover:bg-primary-container transition-colors" data-lang="Hindi">हिन्दी</button>
+                <button class="lang-switch-btn px-2.5 py-1 rounded-lg text-[12px] font-mono font-semibold hover:bg-primary-container transition-colors" data-lang="Hinglish">Hinglish</button>
+                <button class="lang-switch-btn px-2.5 py-1 rounded-lg text-[12px] font-mono font-semibold hover:bg-primary-container transition-colors" data-lang="Tamil">தமிழ்</button>
+                <button class="lang-switch-btn px-2.5 py-1 rounded-lg text-[12px] font-mono font-semibold hover:bg-primary-container transition-colors" data-lang="Telugu">తెలుగు</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- Left Main Area: Video Player & Spoken Script (8 cols) -->
+          <div class="lg:col-span-8 space-y-6">
+            
+            <!-- Video / Audio Player Container -->
+            <div class="relative w-full aspect-video bg-black rounded-2xl overflow-hidden shadow-lg border border-outline-variant/30 flex items-center justify-center">
+              <video id="classroom-video" class="w-full h-full object-contain hidden" controls playsinline></video>
+              <audio id="classroom-audio" class="hidden"></audio>
+              
+              <!-- Placeholder when video is preparing -->
+              <div id="video-placeholder" class="flex flex-col items-center justify-center text-center p-8 space-y-3">
+                <span class="material-symbols-outlined text-[56px] text-white/40 animate-pulse">smart_display</span>
+                <p class="text-white/80 font-headline-md font-semibold text-[16px]">Synthesizing Adaptive Lesson Media...</p>
+                <p class="text-white/50 text-[12px] font-mono">Compositing avatar, neural audio & subtitles</p>
+              </div>
+            </div>
+
+            <!-- Hallucination Shield Verification Card -->
+            <div id="hallucination-shield-card" class="bg-surface-container-low p-4 rounded-2xl border border-tertiary-container/30 flex items-center justify-between shadow-sm">
+              <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-tertiary-container text-[24px]">verified</span>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="font-headline-md text-[13px] font-bold text-on-surface">HALLUCINATION SHIELD</span>
+                    <span id="shield-status-badge" class="bg-tertiary-container text-on-tertiary text-[10px] font-mono px-2 py-0.5 rounded-full font-semibold">GROUNDED</span>
+                  </div>
+                  <p id="shield-message" class="text-[12px] text-on-surface-variant mt-0.5">Verified against uploaded document passages. Zero conflicting claims.</p>
+                </div>
+              </div>
+              <button id="btn-inspect-citation" class="text-[12px] font-mono text-primary hover:underline font-semibold flex items-center gap-1">
+                <span class="material-symbols-outlined text-[16px]">visibility</span>
+                Inspect Source
+              </button>
+            </div>
+
+            <!-- Spoken Script Transcript -->
+            <div class="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/30 space-y-2">
+              <h4 class="font-headline-md text-[14px] font-bold text-on-surface flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-[18px]">chat</span>
+                Teacher Narration
+              </h4>
+              <p id="classroom-explanation-text" class="text-on-surface text-[15px] leading-relaxed"></p>
+            </div>
+
+            <!-- Student Doubt & Follow-up Question Card (Task 2 Requirement) -->
+            <div id="student-doubt-card" class="bg-surface-container-low p-5 rounded-2xl border border-primary/30 space-y-3 shadow-sm">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary text-[20px]">help</span>
+                  <span class="font-headline-md text-[14px] font-bold text-on-surface">Ask BharatGuru (Have a Doubt?)</span>
+                </div>
+                <span class="text-[10px] font-mono text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-full font-semibold">Live Follow-Up</span>
+              </div>
+              <p class="text-[12px] text-on-surface-variant">Ask any follow-up question. The teacher answers with audio & citations without losing your lesson progress.</p>
+              
+              <!-- Quick doubt suggestion chips -->
+              <div class="flex flex-wrap gap-1.5 pt-0.5">
+                <button class="doubt-chip text-[11px] font-mono bg-surface hover:bg-primary hover:text-on-primary border border-outline-variant/40 px-2.5 py-1 rounded-lg transition-colors cursor-pointer" data-q="Can you give another real-world Indian example of this?">🏏 Another Example?</button>
+                <button class="doubt-chip text-[11px] font-mono bg-surface hover:bg-primary hover:text-on-primary border border-outline-variant/40 px-2.5 py-1 rounded-lg transition-colors cursor-pointer" data-q="Why does this happen in real life?">🤔 Why does this happen?</button>
+                <button class="doubt-chip text-[11px] font-mono bg-surface hover:bg-primary hover:text-on-primary border border-outline-variant/40 px-2.5 py-1 rounded-lg transition-colors cursor-pointer" data-q="How does this connect to the previous concept?">🔗 Link to previous concept?</button>
+              </div>
+
+              <!-- Doubt Input & Send -->
+              <div class="flex gap-2">
+                <input id="student-doubt-input" type="text" placeholder="Type your doubt or question here..." class="flex-1 bg-surface border border-outline-variant rounded-xl px-3.5 py-2 text-on-surface text-[13px] focus:border-primary focus:outline-none" />
+                <button id="btn-submit-doubt" class="px-4 py-2 bg-primary text-on-primary font-headline-md font-bold rounded-xl hover:opacity-90 transition-all text-[13px] flex items-center gap-1.5 shrink-0 cursor-pointer">
+                  <span class="material-symbols-outlined text-[16px]">send</span>
+                  Ask Teacher
+                </button>
+              </div>
+
+              <!-- Doubt Response Box (Hidden initially) -->
+              <div id="doubt-response-box" class="hidden p-4 rounded-xl text-[13px] bg-primary/10 border border-primary/20 space-y-2 animate-fade-in">
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-primary flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[16px]">psychology</span>
+                    Teacher Clarification
+                  </span>
+                  <button id="btn-play-doubt-audio" class="hidden text-[11px] font-mono text-primary flex items-center gap-1 hover:underline font-semibold cursor-pointer">
+                    <span class="material-symbols-outlined text-[14px]">volume_up</span> Replay Audio
+                  </button>
+                </div>
+                <p id="doubt-answer-text" class="text-on-surface text-[13px] leading-relaxed"></p>
+                <div id="doubt-grounding-tag" class="text-[11px] font-mono text-tertiary-container flex items-center gap-1"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column: Checkpoint Question, Voice Input & Misconception Engine (4 cols) -->
+          <div class="lg:col-span-4 space-y-6">
+            
+            <!-- Checkpoint Question Card -->
+            <div id="question-card" class="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/30 space-y-4 shadow-sm">
+              <div class="flex items-center justify-between">
+                <h4 class="font-headline-md text-[15px] font-bold text-on-surface flex items-center gap-2">
+                  <span class="material-symbols-outlined text-secondary">help_center</span>
+                  Checkpoint Question
+                </h4>
+                <span id="streak-badge" class="font-mono text-[11px] bg-secondary/15 text-secondary px-2 py-0.5 rounded-full font-bold">Streak: 0 🔥</span>
+              </div>
+
+              <p id="classroom-question-text" class="text-on-surface text-[14px] font-medium leading-relaxed"></p>
+
+              <!-- Student Answer Input Area with Voice Talkback -->
+              <div class="space-y-2.5">
+                <div class="relative">
+                  <textarea id="student-answer-input" rows="3" placeholder="Type your answer or click the mic to speak..." class="w-full bg-surface border border-outline-variant rounded-xl p-3 pr-12 text-on-surface text-[13px] focus:border-primary focus:outline-none resize-none"></textarea>
+                  
+                  <!-- Voice Mic Button -->
+                  <button id="btn-mic-talkback" title="Speak your answer" class="absolute right-3 bottom-3 w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined text-[18px]">mic</span>
+                  </button>
+                </div>
+
+                <div id="mic-status-label" class="hidden text-[11px] font-mono text-secondary flex items-center gap-1">
+                  <span class="w-2 h-2 rounded-full bg-secondary animate-ping"></span>
+                  Listening to your voice...
+                </div>
+
+                <button id="btn-submit-answer" class="w-full bg-primary text-on-primary font-headline-md font-bold py-2.5 rounded-xl hover:opacity-95 transition-all text-[14px] shadow-sm flex items-center justify-center gap-2">
+                  <span class="material-symbols-outlined text-[18px]">send</span>
+                  Submit Answer
+                </button>
+              </div>
+
+              <!-- Grading Feedback Alert Box -->
+              <div id="answer-feedback-box" class="hidden p-4 rounded-xl text-[13px] space-y-1"></div>
+            </div>
+
+            <!-- MISCONCEPTION ENGINE™ LIVE CARD -->
+            <div id="misconception-card" class="hidden bg-error-container/20 p-5 rounded-2xl border border-error-container/50 space-y-3 shadow-sm animate-fade-in">
+              <div class="flex items-center justify-between">
+                <span class="font-headline-md text-[13px] font-bold text-error flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[18px]">fingerprint</span>
+                  MISCONCEPTION DETECTED
+                </span>
+                <span id="misconception-confidence" class="font-mono text-[10px] bg-error/10 text-error px-2 py-0.5 rounded-full font-bold">Conf: 94%</span>
+              </div>
+
+              <div class="space-y-1.5 text-[12px]">
+                <div>
+                  <span class="font-mono text-[10px] uppercase font-bold text-on-surface-variant">Cognitive Root Cause:</span>
+                  <p id="misconception-cause" class="text-on-surface font-medium mt-0.5"></p>
+                </div>
+                <div>
+                  <span class="font-mono text-[10px] uppercase font-bold text-on-surface-variant">Prescribed Pedagogy:</span>
+                  <p id="misconception-intervention" class="text-on-surface font-medium mt-0.5"></p>
+                </div>
+                <div class="p-2.5 rounded-lg bg-surface border border-error-container/30 text-[11px]">
+                  <span class="font-bold text-secondary">Counterexample:</span>
+                  <span id="misconception-counterexample" class="text-on-surface ml-1"></span>
+                </div>
+              </div>
+
+              <button id="btn-adapt-reteach" class="w-full bg-secondary text-on-secondary font-headline-md font-bold py-2 rounded-xl hover:opacity-95 transition-all text-[13px] shadow-sm flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-[16px]">auto_fix_high</span>
+                Re-teach with New Analogy
+              </button>
+            </div>
+
+            <!-- Advance Button -->
+            <button id="btn-advance-segment" class="hidden w-full bg-tertiary-container text-on-tertiary font-headline-md font-bold py-3 rounded-xl hover:opacity-95 transition-all text-[14px] shadow-sm flex items-center justify-center gap-2">
+              <span>Next Concept Segment</span>
+              <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== VIEW: BHARAT 3D LAB™ INTERACTIVE MODELS ==================== -->
+      <section id="view-3d-lab" class="hidden max-w-6xl mx-auto space-y-6 animate-fade-in">
+        <div class="flex flex-wrap items-center justify-between gap-4 bg-surface-container-low p-6 rounded-2xl border border-outline-variant/30 shadow-sm">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[28px] text-secondary">view_in_ar</span>
+              <h2 class="font-headline-md text-[22px] font-bold text-on-surface">Bharat 3D Interactive Science Lab™</h2>
+            </div>
+            <p class="text-[13px] text-on-surface-variant mt-1">Interact, rotate, zoom, and deconstruct 3D biological and physical models generated via Three.js WebGL.</p>
+          </div>
+
+          <!-- Model Switcher Presets -->
+          <div class="flex flex-wrap gap-2" id="3d-models-presets">
+            <button class="model-3d-btn px-3.5 py-1.5 rounded-xl bg-primary text-on-primary text-[12px] font-bold transition-all shadow-sm flex items-center gap-1.5" data-model="dna">
+              🧬 DNA Double Helix
+            </button>
+            <button class="model-3d-btn px-3.5 py-1.5 rounded-xl bg-surface border border-outline-variant hover:bg-surface-container text-on-surface text-[12px] font-bold transition-all shadow-sm flex items-center gap-1.5" data-model="water">
+              💧 Water Molecule (H₂O)
+            </button>
+            <button class="model-3d-btn px-3.5 py-1.5 rounded-xl bg-surface border border-outline-variant hover:bg-surface-container text-on-surface text-[12px] font-bold transition-all shadow-sm flex items-center gap-1.5" data-model="atom">
+              ⚛️ Bohr Atom
+            </button>
+            <button class="model-3d-btn px-3.5 py-1.5 rounded-xl bg-surface border border-outline-variant hover:bg-surface-container text-on-surface text-[12px] font-bold transition-all shadow-sm flex items-center gap-1.5" data-model="mitochondria">
+              🔋 Mitochondria
+            </button>
+            <button class="model-3d-btn px-3.5 py-1.5 rounded-xl bg-surface border border-outline-variant hover:bg-surface-container text-on-surface text-[12px] font-bold transition-all shadow-sm flex items-center gap-1.5" data-model="neuron">
+              🧠 Neuron Cell
+            </button>
+            <button class="model-3d-btn px-3.5 py-1.5 rounded-xl bg-surface border border-outline-variant hover:bg-surface-container text-on-surface text-[12px] font-bold transition-all shadow-sm flex items-center gap-1.5" data-model="motor">
+              ⚡ Electric Motor
+            </button>
+            <button class="model-3d-btn px-3.5 py-1.5 rounded-xl bg-surface border border-outline-variant hover:bg-surface-container text-on-surface text-[12px] font-bold transition-all shadow-sm flex items-center gap-1.5" data-model="solar">
+              🪐 Solar Orbits
+            </button>
+          </div>
+        </div>
+
+        <!-- Custom Prompt Bar -->
+        <div class="bg-surface-container-low p-4 rounded-2xl border border-outline-variant/30 flex items-center gap-3 shadow-sm">
+          <span class="material-symbols-outlined text-primary text-[22px]">magic_button</span>
+          <input id="custom-3d-prompt" type="text" placeholder="Ask Bharat 3D Lab to visualize any scientific structure (e.g. 'Show me DNA model with base pairs' or 'Human Eye')..." class="flex-1 bg-surface border border-outline-variant rounded-xl px-4 py-2 text-on-surface text-[13px] focus:outline-none focus:border-primary" />
+          <button id="btn-generate-3d" class="bg-primary text-on-primary font-bold px-5 py-2 rounded-xl text-[12px] hover:bg-primary-container transition-all flex items-center gap-1.5 shadow-sm">
+            <span>Render 3D</span>
+          </button>
+        </div>
+
+        <!-- 3D Canvas + Interactive Annotations Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- Main 3D Canvas (8 cols) -->
+          <div class="lg:col-span-8 bg-surface-container-low rounded-2xl border border-outline-variant/30 p-4 space-y-3 shadow-md">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 id="3d-model-title" class="font-headline-md text-[17px] font-bold text-on-surface">DNA Double Helix</h3>
+                <p id="3d-model-description" class="text-[12px] text-on-surface-variant">Interactive molecular model showing complementary base pairing.</p>
+              </div>
+
+              <!-- Canvas Controls -->
+              <div class="flex items-center gap-2">
+                <button id="btn-3d-rotate" class="px-3 py-1.5 rounded-lg bg-surface border border-outline-variant hover:bg-surface-container text-[11px] font-mono font-semibold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[15px]">sync</span>
+                  <span id="rotate-status">Pause Rotation</span>
+                </button>
+                <button id="btn-3d-reset" class="px-3 py-1.5 rounded-lg bg-surface border border-outline-variant hover:bg-surface-container text-[11px] font-mono font-semibold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[15px]">center_focus_strong</span>
+                  Reset View
+                </button>
+              </div>
+            </div>
+
+            <!-- WebGL Viewport -->
+            <div id="threejs-canvas-container" class="w-full h-[470px] rounded-xl overflow-hidden relative shadow-inner border border-outline-variant/40 bg-[#07111e] cursor-grab active:cursor-grabbing">
+              <!-- Overlay Hint -->
+              <div class="absolute bottom-3 left-3 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg text-white/80 text-[11px] font-mono pointer-events-none flex items-center gap-1.5 border border-white/10">
+                <span class="material-symbols-outlined text-[14px]">touch_app</span>
+                Drag to rotate • Scroll to zoom • Right-click to pan
+              </div>
+            </div>
+
+            <!-- Base Pair Color Legend (when viewing DNA) -->
+            <div id="dna-legend" class="flex flex-wrap items-center justify-between p-3 bg-surface rounded-xl border border-outline-variant/20 text-[11px]">
+              <span class="font-mono font-bold text-on-surface-variant">Base Pair Legend:</span>
+              <div class="flex items-center gap-4">
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#fe9832]"></span><strong>Adenine (A)</strong></span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#d9381e]"></span><strong>Thymine (T)</strong></span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#00b47d]"></span><strong>Guanine (G)</strong></span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#9c27b0]"></span><strong>Cytosine (C)</strong></span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-white border border-gray-400"></span><strong>H-Bonds</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Annotations & Conceptual Guide (4 cols) -->
+          <div class="lg:col-span-4 space-y-4">
+            <div class="bg-surface-container-low rounded-2xl border border-outline-variant/30 p-5 space-y-4 shadow-sm">
+              <h4 class="font-headline-md text-[15px] font-bold text-on-surface flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-[20px]">explore</span>
+                Interactive Annotations
+              </h4>
+              <p class="text-[12px] text-on-surface-variant">Click any structural component to focus and highlight it in the 3D viewport:</p>
+              
+              <div id="3d-annotations-list" class="space-y-2.5"></div>
+            </div>
+
+            <!-- Pedagogical Reflection Card -->
+            <div class="bg-gradient-to-br from-primary-container/15 via-secondary-container/15 to-primary-container/15 rounded-2xl border border-outline-variant/30 p-5 space-y-3">
+              <span class="font-headline-md text-[13px] font-bold text-primary flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-secondary text-[18px]">psychology</span>
+                Pedagogical Reflection
+              </span>
+              <p class="text-[12px] text-on-surface leading-relaxed">
+                Notice how the complementary purine-pyrimidine base pairs (A=T with two hydrogen bonds, G≡C with three) ensure the outer backbones remain exactly 2.0 nanometers apart throughout the entire helical twist!
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== VIEW 4: STUDENT KNOWLEDGE GRAPH (LIVE) ==================== -->
+      <section id="view-knowledge-graph" class="max-w-6xl mx-auto space-y-6 animate-fade-in">
+        
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-surface-container-low rounded-2xl p-6 shadow-sm border border-outline-variant/30 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-primary-container text-on-primary-container flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[26px]">account_tree</span>
+            </div>
+            <div>
+              <p class="font-label-md text-[11px] text-on-surface-variant uppercase tracking-wider">Overall Mastery</p>
+              <p id="kg-overall-mastery" class="font-headline-lg text-[26px] font-bold text-on-surface">68.4%</p>
+              <p class="text-[11px] text-on-surface-variant">Cognitive skill index</p>
+            </div>
+          </div>
+
+          <div class="bg-surface-container-low rounded-2xl p-6 shadow-sm border border-outline-variant/30 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-tertiary-container text-on-tertiary flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[26px]">verified</span>
+            </div>
+            <div>
+              <p class="font-label-md text-[11px] text-on-surface-variant uppercase tracking-wider">Mastered Concepts</p>
+              <p id="kg-mastered-count" class="font-headline-lg text-[26px] font-bold text-on-surface">7 / 12</p>
+              <p class="text-[11px] text-on-surface-variant">Above 75% retention threshold</p>
+            </div>
+          </div>
+
+          <div class="bg-surface-container-low rounded-2xl p-6 shadow-sm border border-outline-variant/30 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0">
+              <span class="material-symbols-outlined text-[26px]">neurology</span>
+            </div>
+            <div>
+              <p class="font-label-md text-[11px] text-on-surface-variant uppercase tracking-wider">Active Misconceptions</p>
+              <p id="kg-misconceptions-count" class="font-headline-lg text-[26px] font-bold text-on-surface">1 In Progress</p>
+              <p class="text-[11px] text-on-surface-variant">Tracked by Misconception Engine™</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Canvas + Concept Drawer -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-8 bg-surface-container-low rounded-2xl p-6 shadow-sm border border-outline-variant/30 space-y-4">
+            <div class="flex items-center justify-between">
+              <h2 class="font-headline-md text-[18px] font-bold text-on-surface flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">hub</span>
+                Synaptic Concept Hierarchy
+              </h2>
+              <span class="bg-primary/10 text-primary font-mono text-[11px] px-3 py-1 rounded-full font-semibold flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                Dynamic Dependency Graph
+              </span>
+            </div>
+            <div class="relative w-full h-96 bg-surface rounded-xl overflow-hidden border border-outline-variant/30">
+              <canvas id="knowledge-graph-canvas" class="w-full h-full"></canvas>
+            </div>
+          </div>
+
+          <!-- Concept Detail Drawer -->
+          <div class="lg:col-span-4 bg-surface-container-low rounded-2xl p-6 shadow-sm border border-outline-variant/30 space-y-4">
+            <h3 class="font-headline-md text-[16px] font-bold text-on-surface flex items-center gap-2">
+              <span class="material-symbols-outlined text-secondary">info</span>
+              Concept Diagnostics
+            </h3>
+            <div id="concept-detail-box" class="space-y-3 text-[13px]">
+              <p class="text-on-surface-variant">Click any node on the graph to inspect its mastery, confidence, and diagnosed cognitive history.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== VIEW 5: LEARNING DNA ==================== -->
+      <section id="view-learning-dna" class="hidden max-w-5xl mx-auto space-y-6 animate-fade-in">
+        <div class="space-y-1 mt-2">
+          <h1 class="font-display-lg text-[30px] font-bold text-on-surface">Student Learning DNA</h1>
+          <p class="text-on-surface-variant text-[14px]">Empirical profile of your interaction preferences and pedagogical response styles.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- 5-Dimension Bars -->
+          <div class="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/30 space-y-5">
+            <h3 class="font-headline-md text-[16px] font-bold text-on-surface">Cognitive Dimensions</h3>
+            <div id="dna-bars-container" class="space-y-4"></div>
+          </div>
+
+          <!-- Insight Card -->
+          <div class="bg-gradient-to-br from-primary-container/20 to-surface-container-low rounded-2xl p-6 border border-primary/20 space-y-4">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-[24px]">psychology_alt</span>
+              <h3 class="font-headline-md text-[16px] font-bold text-primary">Personalized Pedagogical Insight</h3>
+            </div>
+            <p id="dna-insight-text" class="text-on-surface text-[15px] leading-relaxed font-medium"></p>
+            <div class="p-4 rounded-xl bg-surface border border-outline-variant/30 text-[12px] text-on-surface-variant space-y-1">
+              <span class="font-bold text-on-surface">Adaptive Teacher Optimization:</span>
+              <p>The system automatically weights your explanations with your highest-affinity cognitive dimension to maximize retention speed.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== VIEW 6: SPACED REPETITION QUEUE ==================== -->
+      <section id="view-spaced-repetition" class="hidden max-w-5xl mx-auto space-y-6 animate-fade-in">
+        <div class="flex items-center justify-between mt-2">
+          <div>
+            <h1 class="font-display-lg text-[30px] font-bold text-on-surface">Spaced Repetition Schedule</h1>
+            <p class="text-on-surface-variant text-[14px]">Counteracting the Ebbinghaus forgetting curve with targeted SM-2 review checkpoints.</p>
+          </div>
+          <span class="bg-primary/10 text-primary font-mono text-[12px] font-semibold px-3 py-1 rounded-full">Intervals: 1d &bull; 3d &bull; 7d &bull; 14d</span>
+        </div>
+
+        <div id="spaced-repetition-list" class="space-y-3.5"></div>
+      </section>
+
+      <!-- ==================== VIEW 7: INSTITUTIONAL TEACHER DASHBOARD ==================== -->
+      <section id="view-teacher-dashboard" class="hidden max-w-6xl mx-auto space-y-6 animate-fade-in">
+        <div class="flex items-center justify-between mt-2">
+          <div>
+            <h1 class="font-display-lg text-[30px] font-bold text-on-surface">Institutional Class Overview</h1>
+            <p class="text-on-surface-variant text-[14px]">Class 10-A &bull; 42 Students &bull; Physics & Electricity Cohort</p>
+          </div>
+          <span class="bg-secondary/15 text-secondary font-mono text-[12px] font-bold px-3 py-1 rounded-full">AI Intervention Engine Active</span>
+        </div>
+
+        <!-- Concept Risk Heatmap -->
+        <div class="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/30 space-y-4">
+          <h3 class="font-headline-md text-[17px] font-bold text-on-surface flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">warning</span>
+            Cohort Concept Mastery & High-Risk Areas
+          </h3>
+          <div id="teacher-concepts-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
+
+        <!-- Shared Misconceptions Across Students -->
+        <div class="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/30 space-y-4">
+          <h3 class="font-headline-md text-[17px] font-bold text-on-surface flex items-center gap-2">
+            <span class="material-symbols-outlined text-secondary">group_work</span>
+            Shared Misconception Clusters
+          </h3>
+          <div id="teacher-misconceptions-list" class="space-y-3"></div>
+        </div>
+
+        <!-- 1-Click Remediation Launchers -->
+        <div class="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/30 space-y-4">
+          <h3 class="font-headline-md text-[17px] font-bold text-on-surface flex items-center gap-2">
+            <span class="material-symbols-outlined text-tertiary-container">rocket_launch</span>
+            Recommended Remediation Micro-Lessons
+          </h3>
+          <div id="teacher-remediations-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
+      </section>
+
+      <!-- ==================== VIEW 8: POST-LESSON ASSESSMENT & REPORT ==================== -->
+      <section id="view-quiz-assessment" class="hidden max-w-4xl mx-auto space-y-6 animate-fade-in">
+        <div class="space-y-1 mt-2">
+          <h1 class="font-display-lg text-[30px] font-bold text-on-surface">End-of-Lesson Formative Assessment</h1>
+          <p class="text-on-surface-variant text-[14px]">Questions are restricted exclusively to concepts covered in this session.</p>
+        </div>
+
+        <div id="quiz-questions-container" class="space-y-6"></div>
+
+        <button id="btn-submit-quiz" class="w-full bg-primary text-on-primary font-headline-md font-bold py-3.5 rounded-xl hover:scale-[1.01] transition-all shadow-md flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined">grade</span>
+          Submit Assessment & Generate Report Card
+        </button>
+
+        <!-- Final Report Card Box -->
+        <div id="report-card-container" class="hidden bg-surface-container-low rounded-2xl p-8 border border-outline-variant/30 space-y-6 shadow-md"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- SOURCE PASSAGE MODAL (CITATION INSPECTOR) -->
+  <div id="citation-modal" class="fixed inset-0 bg-black/60 z-[100] hidden flex items-center justify-center p-4">
+    <div class="bg-surface rounded-2xl max-w-lg w-full p-6 border border-outline-variant/30 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="font-headline-md text-[16px] font-bold text-on-surface flex items-center gap-2">
+          <span class="material-symbols-outlined text-tertiary-container">verified</span>
+          Source Document Citation
+        </h3>
+        <button id="btn-close-modal" class="text-on-surface-variant hover:text-on-surface">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div class="space-y-2 text-[13px]">
+        <div class="font-mono text-[11px] bg-primary/10 text-primary px-3 py-1 rounded-md font-semibold" id="modal-citation-label"></div>
+        <p class="text-on-surface-variant italic p-3 bg-surface-container rounded-xl border border-outline-variant/20" id="modal-citation-snippet"></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="/knowledge_graph.js"></script>
+  <script src="/three_lab.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
