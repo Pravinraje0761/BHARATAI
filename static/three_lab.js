@@ -19,6 +19,7 @@ class Bharat3DLab {
     this.dynamicObjects = [];
     this.unwindFactor = 0.0; // 0 = helical, 1 = unzipped ladder
     this.currentSpec = null;
+    this.loadToken = 0;
 
     if (this.container) {
       this.init();
@@ -106,17 +107,21 @@ class Bharat3DLab {
   }
 
   async loadModel(conceptOrKey) {
+    const token = ++this.loadToken;
     try {
       const res = await fetch(`/api/3d/model?concept=${encodeURIComponent(conceptOrKey)}`);
       const spec = await res.json();
+      if (token !== this.loadToken) return; // superseded by a newer request
       this.renderSpec(spec);
     } catch (err) {
       console.error('Failed to load 3D model spec from server, using local fallback:', err);
+      if (token !== this.loadToken) return;
       this.renderDNAHelix();
     }
   }
 
   renderSpec(spec) {
+    this.loadToken++; // invalidate any in-flight loadModel() fetch
     this.currentSpec = spec;
     this.clearModel();
     this.currentModelType = spec.model_type;
@@ -129,6 +134,12 @@ class Bharat3DLab {
 
     // Update annotations panel
     this.renderAnnotationsUI(spec.annotations);
+
+    // Update pedagogical reflection card
+    const reflectionEl = document.getElementById('3d-pedagogical-reflection');
+    if (reflectionEl && spec.pedagogical_reflection) {
+      reflectionEl.textContent = spec.pedagogical_reflection;
+    }
 
     if (spec.camera_position && this.camera) {
       this.camera.position.set(...spec.camera_position);
@@ -150,6 +161,8 @@ class Bharat3DLab {
       this.renderElectricMotor(spec.parameters);
     } else if (spec.model_type === 'solar_orbits') {
       this.renderSolarSystem(spec.parameters);
+    } else if (spec.model_type === 'human_eye') {
+      this.renderHumanEye(spec.parameters);
     } else {
       this.renderProceduralScene(spec);
     }
@@ -177,6 +190,10 @@ class Bharat3DLab {
         geo = new THREE.ConeGeometry(sx, sy || 2, 20);
       } else if (el.shape === 'torus') {
         geo = new THREE.TorusGeometry(sx, sy || 0.25, 16, 48);
+      } else if (el.shape === 'ring') {
+        geo = new THREE.RingGeometry(sx, sy || sx * 1.5, 36);
+      } else if (el.shape === 'circle') {
+        geo = new THREE.CircleGeometry(sx, 32);
       } else if (el.shape === 'capsule') {
         geo = new THREE.CylinderGeometry(sx, sx, sy || 4, 24);
       } else {
@@ -559,6 +576,207 @@ class Bharat3DLab {
   }
 
   // ------------------------------------------------------------------------- //
+  // 5. Human Eye 3D Generator (Anatomy & Optics of Vision)
+  // ------------------------------------------------------------------------- //
+  renderHumanEye(params = {}) {
+    const eyeGroup = new THREE.Group();
+
+    // 1. Eyeball / Sclera (Anatomical 3/4 cutaway to visualize internal structures)
+    const scleraGeo = new THREE.SphereGeometry(3.8, 36, 36, 0, Math.PI * 1.62, 0, Math.PI);
+    const scleraMat = new THREE.MeshStandardMaterial({
+      color: 0xf4f5f8,
+      roughness: 0.35,
+      metalness: 0.08,
+      side: THREE.DoubleSide,
+    });
+    const scleraMesh = new THREE.Mesh(scleraGeo, scleraMat);
+    eyeGroup.add(scleraMesh);
+
+    // Cross-section cut rim giving clean anatomical slice
+    const cutPlaneGeo = new THREE.RingGeometry(0.5, 3.8, 36, 1, 0, Math.PI);
+    const cutPlaneMat = new THREE.MeshStandardMaterial({
+      color: 0xef9a9a,
+      roughness: 0.5,
+      side: THREE.DoubleSide,
+    });
+    const cutPlane = new THREE.Mesh(cutPlaneGeo, cutPlaneMat);
+    cutPlane.rotation.y = Math.PI * 0.5;
+    eyeGroup.add(cutPlane);
+
+    // 2. Cornea (Front transparent bulging dome)
+    const corneaGeo = new THREE.SphereGeometry(2.3, 32, 32, 0, Math.PI * 2, 0, Math.PI * 0.44);
+    const corneaMat = new THREE.MeshStandardMaterial({
+      color: 0x80deea,
+      transparent: true,
+      opacity: 0.45,
+      roughness: 0.08,
+      metalness: 0.1,
+      side: THREE.DoubleSide,
+    });
+    const corneaMesh = new THREE.Mesh(corneaGeo, corneaMat);
+    corneaMesh.position.set(0, 0, 1.95);
+    eyeGroup.add(corneaMesh);
+
+    // Limbus ring
+    const limbusGeo = new THREE.TorusGeometry(2.18, 0.08, 16, 48);
+    const limbusMat = new THREE.MeshStandardMaterial({ color: 0x80deea, roughness: 0.3 });
+    const limbus = new THREE.Mesh(limbusGeo, limbusMat);
+    limbus.position.set(0, 0, 2.3);
+    eyeGroup.add(limbus);
+
+    // 3. Iris (Pigmented muscular diaphragm with azure/amber coloration)
+    const irisGeo = new THREE.RingGeometry(0.82, 2.15, 48);
+    const irisMat = new THREE.MeshStandardMaterial({
+      color: 0x0288d1,
+      roughness: 0.4,
+      side: THREE.DoubleSide,
+    });
+    const irisMesh = new THREE.Mesh(irisGeo, irisMat);
+    irisMesh.position.set(0, 0, 2.35);
+    eyeGroup.add(irisMesh);
+
+    // Radial striations on iris
+    for (let i = 0; i < 24; i++) {
+      const angle = (i / 24) * Math.PI * 2;
+      const strGeo = new THREE.BoxGeometry(0.04, 1.25, 0.02);
+      const strMat = new THREE.MeshBasicMaterial({ color: 0x81d4fa });
+      const strMesh = new THREE.Mesh(strGeo, strMat);
+      strMesh.position.set(Math.cos(angle) * 1.5, Math.sin(angle) * 1.5, 2.36);
+      strMesh.rotation.z = angle + Math.PI * 0.5;
+      eyeGroup.add(strMesh);
+    }
+
+    // 4. Pupil (Central aperture)
+    const pupilGeo = new THREE.CircleGeometry(0.82, 36);
+    const pupilMat = new THREE.MeshBasicMaterial({ color: 0x05070a });
+    const pupilMesh = new THREE.Mesh(pupilGeo, pupilMat);
+    pupilMesh.position.set(0, 0, 2.34);
+    eyeGroup.add(pupilMesh);
+
+    // 5. Crystalline Biconvex Lens
+    const lensGeo = new THREE.SphereGeometry(1.42, 32, 32);
+    const lensMat = new THREE.MeshStandardMaterial({
+      color: 0xe0f7fa,
+      transparent: true,
+      opacity: 0.68,
+      roughness: 0.06,
+      metalness: 0.12,
+    });
+    const lensMesh = new THREE.Mesh(lensGeo, lensMat);
+    lensMesh.scale.set(1.0, 1.0, 0.42);
+    lensMesh.position.set(0, 0, 1.7);
+    eyeGroup.add(lensMesh);
+
+    // 6. Ciliary Body & Suspensory Ligaments (Zonules)
+    const ciliaryGeo = new THREE.TorusGeometry(2.2, 0.22, 16, 36);
+    const ciliaryMat = new THREE.MeshStandardMaterial({ color: 0xd32f2f, roughness: 0.5 });
+    const ciliaryMesh = new THREE.Mesh(ciliaryGeo, ciliaryMat);
+    ciliaryMesh.position.set(0, 0, 1.7);
+    eyeGroup.add(ciliaryMesh);
+
+    // Suspensory ligament cords
+    for (let i = 0; i < 20; i++) {
+      const theta = (i / 20) * Math.PI * 2;
+      const x1 = Math.cos(theta) * 1.4;
+      const y1 = Math.sin(theta) * 1.4;
+      const x2 = Math.cos(theta) * 2.05;
+      const y2 = Math.sin(theta) * 2.05;
+
+      const ligCyl = this.createCylinderBetweenPoints(
+        new THREE.Vector3(x1, y1, 1.7),
+        new THREE.Vector3(x2, y2, 1.7),
+        0.025,
+        new THREE.MeshBasicMaterial({ color: 0xffcdd2 })
+      );
+      eyeGroup.add(ligCyl);
+    }
+
+    // 7. Retina (Posterior inner sensory layer with fovea)
+    const retinaGeo = new THREE.SphereGeometry(3.55, 32, 32, 0, Math.PI * 1.55, 0, Math.PI);
+    const retinaMat = new THREE.MeshStandardMaterial({
+      color: 0xd84315,
+      roughness: 0.6,
+      side: THREE.BackSide,
+    });
+    const retinaMesh = new THREE.Mesh(retinaGeo, retinaMat);
+    eyeGroup.add(retinaMesh);
+
+    // Fovea Centralis (Yellow Spot)
+    const foveaGeo = new THREE.SphereGeometry(0.35, 16, 16);
+    const foveaMat = new THREE.MeshStandardMaterial({
+      color: 0xffeb3b,
+      emissive: 0xffa000,
+      roughness: 0.3,
+    });
+    const foveaMesh = new THREE.Mesh(foveaGeo, foveaMat);
+    foveaMesh.position.set(0.6, 0.2, -3.5);
+    eyeGroup.add(foveaMesh);
+
+    // 8. Optic Nerve (Posterior nerve bundle)
+    const nerveGeo = new THREE.CylinderGeometry(0.72, 0.68, 3.8, 24);
+    const nerveMat = new THREE.MeshStandardMaterial({
+      color: 0xffe082,
+      roughness: 0.5,
+    });
+    const nerveMesh = new THREE.Mesh(nerveGeo, nerveMat);
+    nerveMesh.position.set(0.2, -0.4, -5.5);
+    nerveMesh.rotation.x = Math.PI * 0.5;
+    nerveMesh.rotation.z = -0.08;
+    eyeGroup.add(nerveMesh);
+
+    // 9. Simulated Optical Light Rays (Refraction through cornea & lens focusing on retina)
+    const rayColors = [0x00e5ff, 0xffeb3b, 0x00e5ff];
+    const rayYs = [0.85, 0.0, -0.85];
+
+    rayYs.forEach((ry, idx) => {
+      // Incident parallel ray from front (z=8.5) to cornea (z=3.8)
+      const r1 = this.createCylinderBetweenPoints(
+        new THREE.Vector3(0, ry, 8.5),
+        new THREE.Vector3(0, ry * 0.9, 3.8),
+        0.035,
+        new THREE.MeshBasicMaterial({ color: rayColors[idx] })
+      );
+      eyeGroup.add(r1);
+
+      // Refracted ray through anterior chamber & lens (z=3.8 to z=1.7)
+      const r2 = this.createCylinderBetweenPoints(
+        new THREE.Vector3(0, ry * 0.9, 3.8),
+        new THREE.Vector3(0, ry * 0.6, 1.7),
+        0.035,
+        new THREE.MeshBasicMaterial({ color: rayColors[idx] })
+      );
+      eyeGroup.add(r2);
+
+      // Converging ray from lens to focal point on the retina (z=1.7 to z=-3.55)
+      const r3 = this.createCylinderBetweenPoints(
+        new THREE.Vector3(0, ry * 0.6, 1.7),
+        new THREE.Vector3(0.6, 0.2, -3.55),
+        0.035,
+        new THREE.MeshBasicMaterial({ color: rayColors[idx] })
+      );
+      eyeGroup.add(r3);
+    });
+
+    // Photon pulse animation along rays
+    for (let i = 0; i < 3; i++) {
+      const pulseGeo = new THREE.SphereGeometry(0.12, 12, 12);
+      const pulseMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+      const pulseMesh = new THREE.Mesh(pulseGeo, pulseMat);
+      eyeGroup.add(pulseMesh);
+
+      this.dynamicObjects.push({
+        type: 'eye_photon',
+        mesh: pulseMesh,
+        progress: i * 0.33,
+        speed: 0.008,
+        startY: rayYs[i],
+      });
+    }
+
+    this.modelGroup.add(eyeGroup);
+  }
+
+  // ------------------------------------------------------------------------- //
   // Animation Loop
   // ------------------------------------------------------------------------- //
   animate() {
@@ -569,7 +787,7 @@ class Bharat3DLab {
       this.modelGroup.rotation.y += this.rotationSpeed;
     }
 
-    // Dynamic animation elements (electrons, armature, planets)
+    // Dynamic animation elements (electrons, armature, planets, eye photons)
     this.dynamicObjects.forEach(obj => {
       if (obj.mesh && obj.radius) {
         // Bohr electron
@@ -584,6 +802,19 @@ class Bharat3DLab {
         obj.angle += obj.speed;
         obj.mesh.position.x = Math.cos(obj.angle) * obj.dist;
         obj.mesh.position.z = Math.sin(obj.angle) * obj.dist;
+      } else if (obj.type === 'eye_photon') {
+        obj.progress = (obj.progress + obj.speed) % 1.0;
+        const p = obj.progress;
+        if (p < 0.35) {
+          const t = p / 0.35;
+          obj.mesh.position.set(0, obj.startY * (1 - t * 0.1), 8.5 - t * 4.7);
+        } else if (p < 0.55) {
+          const t = (p - 0.35) / 0.20;
+          obj.mesh.position.set(0, obj.startY * (0.9 - t * 0.3), 3.8 - t * 2.1);
+        } else {
+          const t = (p - 0.55) / 0.45;
+          obj.mesh.position.set(0.6 * t, (obj.startY * 0.6) * (1 - t) + 0.2 * t, 1.7 - t * 5.25);
+        }
       }
     });
 

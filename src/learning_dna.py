@@ -58,6 +58,22 @@ def compute_learning_dna(student: str, db_path: Path | str | None = None) -> Lea
     successes = sum(r["successes"] for r in kg_nodes) if kg_nodes else 0
     accuracy = (successes / max(1, total_attempts))
 
+    # No activity yet -> report an empty profile instead of synthesising numbers.
+    if total_sessions == 0 and total_attempts == 0:
+        return LearningDNAProfile(
+            student=student,
+            visual_affinity=0,
+            example_driven=0,
+            conceptual_depth=0,
+            recall_retention=0,
+            socratic_engagement=0,
+            dominant_trait="—",
+            personalized_insight=(
+                "Not enough learning activity yet. Complete a lesson and its "
+                "checkpoint questions to build your Learning DNA."
+            ),
+        )
+
     # Observed trait calibration
     example_affinity = min(94, max(58, int(72 + total_sessions * 2.5)))
     visual_affinity = min(92, max(50, int(80 + (1.0 - accuracy) * 15)))

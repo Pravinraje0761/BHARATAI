@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Sign In — BHARATGURU Adaptive AI</title>
+  <meta name="description" content="Sign in to BHARATGURU to save your concept mastery graph and get adaptive AI tutoring across 12 Indian languages, mapped to CBSE, JEE and NEET syllabi."/>
+  <meta property="og:title" content="Sign In — BHARATGURU Adaptive AI"/>
+  <meta property="og:description" content="Adaptive AI tutoring across 12 Indian languages, mapped to CBSE, JEE and NEET syllabi."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:image" content="/favicon.svg"/>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+  <!-- Firebase Web SDK (compat v10) & Analytics -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#002045",
+            "on-primary": "#ffffff",
+            "primary-container": "#1a365d",
+            "on-primary-container": "#86a0cd",
+            "primary-fixed": "#d6e3ff",
+            "secondary": "#8f4e00",
+            "on-secondary": "#ffffff",
+            "secondary-container": "#fe9832",
+            "on-secondary-container": "#683700",
+            "tertiary": "#002617",
+            "on-tertiary": "#ffffff",
+            "tertiary-container": "#003e29",
+            "surface": "#f8f9ff",
+            "surface-dim": "#cbdbf5",
+            "surface-bright": "#f8f9ff",
+            "surface-container-low": "#eff4ff",
+            "surface-container": "#e5eeff",
+            "surface-container-high": "#dce9ff",
+            "on-surface": "#0b1c30",
+            "on-surface-variant": "#43474e",
+            "outline": "#74777f",
+            "outline-variant": "#c4c6cf",
+            "error": "#ba1a1a",
+            "error-container": "#ffdad6"
+          },
+          fontFamily: {
+            "display-lg": ["Plus Jakarta Sans", "sans-serif"],
+            "headline-lg": ["Plus Jakarta Sans", "sans-serif"],
+            "headline-md": ["Plus Jakarta Sans", "sans-serif"],
+            "body-lg": ["Inter", "sans-serif"],
+            "body-md": ["Inter", "sans-serif"],
+            "label-md": ["JetBrains Mono", "monospace"],
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/styles.css"/>
+  <style>
+    .gradient-mesh {
+      background: radial-gradient(at 0% 0%, rgba(26, 54, 93, 0.12) 0px, transparent 50%),
+                  radial-gradient(at 100% 100%, rgba(254, 152, 50, 0.10) 0px, transparent 50%),
+                  radial-gradient(at 50% 50%, rgba(0, 38, 23, 0.06) 0px, transparent 50%);
+    }
+    .auth-glass-card {
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+  </style>
+</head>
+<body class="bg-surface font-body-md text-on-surface antialiased min-h-screen gradient-mesh flex flex-col justify-between">
+
+  <!-- ======================== HEADER BAR ======================== -->
+  <header class="h-20 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/30 flex items-center justify-between px-6 lg:px-12 sticky top-0 z-50">
+    <div class="flex items-center gap-3">
+      <a href="/" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-container flex items-center justify-center text-on-primary font-bold shadow-sm group-hover:scale-105 transition-transform">
+          <span class="material-symbols-outlined text-[24px]">school</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-headline-md text-[20px] text-primary font-bold tracking-tight">BHARATGURU</span>
+            <span class="bg-secondary/10 text-secondary text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-secondary/20">v2.0</span>
+          </div>
+          <span class="block text-[11px] font-mono text-on-surface-variant">Multilingual Adaptive AI Learning System</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <span class="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-mono bg-emerald-50 text-emerald-800 border border-emerald-200">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        100% Free & Open Backend
+      </span>
+      <a href="/" class="inline-flex items-center gap-1.5 text-[13px] font-semibold text-primary hover:text-secondary-container transition-colors px-3 py-1.5 rounded-xl hover:bg-surface-container">
+        <span>Enter Classroom</span>
+        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ======================== MAIN AUTH CONTAINER ======================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-6 lg:px-12 py-8 lg:py-12 flex flex-col lg:flex-row items-center justify-center gap-12">
+    
+    <!-- LEFT COLUMN: BRAND HERO & HIGHLIGHTS -->
+    <div class="w-full lg:w-1/2 space-y-8">
+      <div class="space-y-4">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-secondary/10 border border-secondary/20 text-secondary font-mono text-[12px] font-semibold">
+          <span class="material-symbols-outlined text-[16px]">psychology</span>
+          Adaptive Socratic AI Pedagogy
+        </div>
+        <h1 class="font-display-lg text-[36px] lg:text-[44px] font-extrabold text-primary leading-[1.15] tracking-tight">
+          Personalized Indian STEM Education for Every Student.
+        </h1>
+        <p class="text-[16px] text-on-surface-variant leading-relaxed">
+          Sign in to preserve your concept mastery knowledge graph, personalize cognitive remediation, and experience real-time AI tutoring across 12 Indian languages.
+        </p>
+      </div>
+
+      <!-- FEATURE TILES -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        
+        <!-- Tile 1 -->
+        <div class="p-4 rounded-2xl bg-white/80 border border-outline-variant/40 shadow-sm space-y-1.5 hover:border-primary/40 transition-colors">
+          <div class="flex items-center gap-2 text-primary font-bold text-[14px]">
+            <span class="material-symbols-outlined text-secondary text-[20px]">database</span>
+            <span>100% Free Backend</span>
+          </div>
+          <p class="text-[12px] text-on-surface-variant">Embedded zero-cost SQLite storage and instant fallback to offline AI inference.</p>
+        </div>
+
+        <!-- Tile 2 -->
+        <div class="p-4 rounded-2xl bg-white/80 border border-outline-variant/40 shadow-sm space-y-1.5 hover:border-primary/40 transition-colors">
+          <div class="flex items-center gap-2 text-primary font-bold text-[14px]">
+            <span class="material-symbols-outlined text-secondary text-[20px]">translate</span>
+            <span>12 Indian Languages</span>
+          </div>
+          <p class="text-[12px] text-on-surface-variant">Hindi, Tamil, Telugu, Kannada, Bengali, Marathi, Gujarati, Punjabi & more.</p>
+        </div>
+
+        <!-- Tile 3 -->
+        <div class="p-4 rounded-2xl bg-white/80 border border-outline-variant/40 shadow-sm space-y-1.5 hover:border-primary/40 transition-colors">
+          <div class="flex items-center gap-2 text-primary font-bold text-[14px]">
+            <span class="material-symbols-outlined text-secondary text-[20px]">fingerprint</span>
+            <span>Misconception Engine™</span>
+          </div>
+          <p class="text-[12px] text-on-surface-variant">Fingerprints flawed mental models and adapts teaching methods on the fly.</p>
+        </div>
+
+        <!-- Tile 4 -->
+        <div class="p-4 rounded-2xl bg-white/80 border border-outline-variant/40 shadow-sm space-y-1.5 hover:border-primary/40 transition-colors">
+          <div class="flex items-center gap-2 text-primary font-bold text-[14px]">
+            <span class="material-symbols-outlined text-secondary text-[20px]">view_in_ar</span>
+            <span>Bharat 3D Lab™</span>
+          </div>
+          <p class="text-[12px] text-on-surface-variant">Interactive WebGL simulations for Physics, Chemistry, and Biology.</p>
+        </div>
+
+      </div>
+
+      <!-- Testimonial / Pedagogy Banner -->
+      <div class="p-4 rounded-2xl bg-primary-container/5 border-l-4 border-secondary-container space-y-2">
+        <p class="text-[13px] text-on-surface-variant italic leading-relaxed">
+          &ldquo;BHARATGURU empowers teachers with cohort diagnosis and guarantees every child learns with zero anxiety in their mother tongue.&rdquo;
+        </p>
+        <span class="block text-[11px] font-mono text-primary font-semibold">
+          — Dr. Priya Sharma, Senior Physics Faculty & Pedagogy Lead
+        </span>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: AUTH CARD -->
+    <div class="w-full lg:w-[480px]">
+      <div class="auth-glass-card rounded-3xl border border-outline-variant/40 shadow-2xl p-6 sm:p-8 space-y-6">
+        
+        <!-- 1-CLICK QUICK DEMO LOGINS (FEATURE HIGHLIGHT AT TOP) -->
+        <div class="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 border-2 border-secondary/40 space-y-2.5 shadow-sm">
+          <div class="flex items-center justify-between">
+            <span class="text-[13px] font-headline-md font-bold text-secondary flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[20px]">bolt</span>
+              Instant Demo Access (No typing needed)
+            </span>
+            <span class="text-[10px] font-mono bg-secondary text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">1-Click</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <button id="btn-demo-student" type="button" class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-white hover:bg-primary hover:text-on-primary text-primary border border-primary/30 text-[12px] font-bold transition-all shadow-sm group cursor-pointer">
+              <span class="text-[16px] group-hover:scale-110 transition-transform">👨‍🎓</span>
+              <div class="text-left">
+                <span class="block leading-tight">Demo Student</span>
+                <span class="block text-[10px] opacity-75 font-normal">Aarav Patel (CBSE 10)</span>
+              </div>
+            </button>
+            <button id="btn-demo-teacher" type="button" class="flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-white hover:bg-secondary hover:text-on-secondary text-secondary border border-secondary/30 text-[12px] font-bold transition-all shadow-sm group cursor-pointer">
+              <span class="text-[16px] group-hover:scale-110 transition-transform">👩‍🏫</span>
+              <div class="text-left">
+                <span class="block leading-tight">Demo Teacher</span>
+                <span class="block text-[10px] opacity-75 font-normal">Dr. Priya (Physics)</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- DUAL ROLE PORTAL SELECTOR: STUDENT PORTAL vs TEACHER PORTAL -->
+        <div class="space-y-2">
+          <span class="block text-[11px] font-mono uppercase font-bold text-on-surface-variant tracking-wider">Select Portal Type</span>
+          <div class="grid grid-cols-2 gap-2 p-1.5 rounded-2xl bg-surface-container border border-outline-variant/30">
+            <button id="portal-btn-student" type="button" class="py-2.5 px-3 rounded-xl text-[13px] font-headline-md font-bold transition-all bg-white text-primary shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+              <span>🎓</span>
+              <span>Student Portal</span>
+            </button>
+            <button id="portal-btn-teacher" type="button" class="py-2.5 px-3 rounded-xl text-[13px] font-headline-md font-medium text-on-surface-variant hover:text-primary transition-all flex items-center justify-center gap-2 cursor-pointer">
+              <span>👩‍🏫</span>
+              <span>Teacher Portal</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ROLE VISIBILITY NOTICE -->
+        <div id="portal-description-box" class="p-3 rounded-xl bg-primary/5 border border-primary/20 text-[12px] text-on-surface-variant flex items-start gap-2">
+          <span class="material-symbols-outlined text-[18px] text-primary shrink-0 mt-0.5">school</span>
+          <span id="portal-description-text">
+            <strong>Student View</strong>: Access your personalized lesson plan, live AI classroom, 3D STEM models, and memory flashcards. (Class-wide teaching reports and student rosters are hidden).
+          </span>
+        </div>
+
+        <!-- SEGMENTED TAB SWITCHER: SIGN IN vs CREATE ACCOUNT -->
+        <div class="flex p-1 rounded-2xl bg-surface-container-low border border-outline-variant/30">
+          <button id="tab-btn-login" class="flex-1 py-2 rounded-xl text-[13px] font-headline-md font-bold transition-all bg-white text-primary shadow-sm cursor-pointer" type="button">
+            Sign In
+          </button>
+          <button id="tab-btn-register" class="flex-1 py-2 rounded-xl text-[13px] font-headline-md font-medium text-on-surface-variant transition-all hover:text-primary cursor-pointer" type="button">
+            Create Account
+          </button>
+        </div>
+
+        <!-- ALERT / NOTIFICATION BANNER -->
+        <div id="auth-alert" class="hidden p-3.5 rounded-xl text-[13px] flex items-start gap-2.5 border animate-fade-in">
+          <span id="auth-alert-icon" class="material-symbols-outlined text-[20px] shrink-0 mt-0.5">info</span>
+          <div id="auth-alert-msg" class="flex-1 font-medium leading-relaxed"></div>
+        </div>
+
+        <!-- GOOGLE SIGN-IN VIA FIREBASE -->
+        <div class="space-y-2">
+          <button id="btn-google-signin" type="button" class="w-full py-3 px-4 rounded-xl bg-white hover:bg-surface-container border border-outline-variant/50 text-on-surface font-headline-md font-semibold text-[14px] shadow-sm hover:shadow transition-all flex items-center justify-center gap-3 cursor-pointer">
+            <svg class="w-5 h-5" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            <span id="btn-google-text">Continue as Student with Google</span>
+            <span id="btn-google-spinner" class="hidden material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
+          </button>
+
+          <!-- Firebase Status & Config Bar -->
+          <div class="flex items-center justify-between px-3 py-1.5 rounded-xl bg-blue-50/60 border border-blue-200/50 text-[11px] font-mono text-blue-900">
+            <div class="flex items-center gap-1.5">
+              <span id="fb-status-dot" class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+              <span id="fb-status-text">Firebase Cloud Auth Ready</span>
+            </div>
+            <button id="btn-toggle-fb-config" type="button" class="text-blue-700 hover:text-blue-900 font-semibold underline text-[10px]">
+              Setup / Keys
+            </button>
+          </div>
+
+          <!-- Collapsible Firebase Web Config Editor -->
+          <div id="panel-fb-config" class="hidden p-3 rounded-xl bg-surface-container border border-outline-variant/40 space-y-2 text-[11px]">
+            <span class="block font-bold text-on-surface">Firebase Web Project Config:</span>
+            <input id="input-fb-api-key" type="text" placeholder="apiKey: AIzaSy..." class="w-full px-2.5 py-1.5 rounded-lg border border-outline-variant/40 text-[11px] font-mono bg-white outline-none"/>
+            <input id="input-fb-project-id" type="text" placeholder="projectId: my-bharat-ai" class="w-full px-2.5 py-1.5 rounded-lg border border-outline-variant/40 text-[11px] font-mono bg-white outline-none"/>
+            <div class="flex gap-2">
+              <button id="btn-save-fb-config" type="button" class="flex-1 py-1 px-2 rounded-lg bg-primary text-on-primary text-[11px] font-bold">Apply Config</button>
+              <button id="btn-demo-fb-auth" type="button" class="flex-1 py-1 px-2 rounded-lg bg-secondary/10 text-secondary border border-secondary/30 text-[11px] font-bold">Simulate Google Login</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="relative flex items-center justify-center">
+          <div class="border-t border-outline-variant/30 w-full"></div>
+          <span class="bg-white px-3 text-[11px] font-mono text-on-surface-variant uppercase tracking-wider absolute">or with credentials</span>
+        </div>
+
+        <!-- AUTH FORM -->
+        <form id="auth-form" class="space-y-4">
+          <!-- Hidden radio for compatibility with script -->
+          <input type="hidden" id="hidden-role-input" name="auth-role" value="student"/>
+
+          <!-- FULL NAME (ONLY FOR REGISTRATION) -->
+          <div id="field-fullname" class="hidden space-y-1.5">
+            <label for="input-fullname" class="block text-[12px] font-semibold text-on-surface">Full Name</label>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3 top-3 text-[18px] text-on-surface-variant">person</span>
+              <input id="input-fullname" type="text" placeholder="e.g. Aarav Patel" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary focus:ring-2 focus:ring-primary/20 text-[14px] bg-white transition-all outline-none"/>
+            </div>
+          </div>
+
+          <!-- USERNAME OR EMAIL -->
+          <div class="space-y-1.5">
+            <label id="label-username" for="input-username" class="block text-[12px] font-semibold text-on-surface">Username or Email</label>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3 top-3 text-[18px] text-on-surface-variant">alternate_email</span>
+              <input id="input-username" type="text" required placeholder="e.g. aarav or aarav@school.edu" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary focus:ring-2 focus:ring-primary/20 text-[14px] bg-white transition-all outline-none"/>
+            </div>
+          </div>
+
+          <!-- EMAIL (ONLY FOR REGISTRATION) -->
+          <div id="field-email" class="hidden space-y-1.5">
+            <label for="input-email" class="block text-[12px] font-semibold text-on-surface">Email Address</label>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3 top-3 text-[18px] text-on-surface-variant">mail</span>
+              <input id="input-email" type="email" placeholder="student@bharatguru.edu" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary focus:ring-2 focus:ring-primary/20 text-[14px] bg-white transition-all outline-none"/>
+            </div>
+          </div>
+
+          <!-- GRADE / BOARD OR SUBJECT (ONLY FOR REGISTRATION) -->
+          <div id="field-grade" class="hidden space-y-1.5">
+            <label id="label-grade" for="select-grade" class="block text-[12px] font-semibold text-on-surface">Syllabus / Exam Board</label>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3 top-3 text-[18px] text-on-surface-variant">menu_book</span>
+              <select id="select-grade" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary focus:ring-2 focus:ring-primary/20 text-[14px] bg-white transition-all outline-none cursor-pointer">
+                <option value="CBSE Class 10">CBSE Class 10</option>
+                <option value="CBSE Class 12">CBSE Class 12</option>
+                <option value="ICSE / ISC">ICSE / ISC</option>
+                <option value="JEE Main & Advanced">JEE Main & Advanced</option>
+                <option value="NEET-UG">NEET-UG (Medical)</option>
+                <option value="State Board">State Board</option>
+                <option value="Custom Syllabus">Custom Syllabus</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- PREFERRED LANGUAGE (ONLY FOR REGISTRATION) -->
+          <div id="field-language" class="hidden space-y-1.5">
+            <label for="select-language" class="block text-[12px] font-semibold text-on-surface">Primary Learning Language</label>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3 top-3 text-[18px] text-on-surface-variant">language</span>
+              <select id="select-language" class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary focus:ring-2 focus:ring-primary/20 text-[14px] bg-white transition-all outline-none cursor-pointer">
+                <option value="English">English</option>
+                <option value="Hindi">हिन्दी (Hindi)</option>
+                <option value="Hinglish">Hinglish</option>
+                <option value="Tamil">தமிழ் (Tamil)</option>
+                <option value="Telugu">తెలుగు (Telugu)</option>
+                <option value="Kannada">ಕನ್ನಡ (Kannada)</option>
+                <option value="Malayalam">മലയാളം (Malayalam)</option>
+                <option value="Bengali">বাংলা (Bengali)</option>
+                <option value="Marathi">मराठी (Marathi)</option>
+                <option value="Gujarati">ગુજરાતી (Gujarati)</option>
+                <option value="Punjabi">ਪੰਜਾਬੀ (Punjabi)</option>
+                <option value="Urdu">اردو (Urdu)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- PASSWORD -->
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label for="input-password" class="block text-[12px] font-semibold text-on-surface">Password</label>
+              <span id="hint-password" class="text-[11px] text-on-surface-variant font-mono">(min 6 chars)</span>
+            </div>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3 top-3 text-[18px] text-on-surface-variant">lock</span>
+              <input id="input-password" type="password" required placeholder="••••••••" class="w-full pl-10 pr-10 py-2.5 rounded-xl border border-outline-variant/50 focus:border-primary focus:ring-2 focus:ring-primary/20 text-[14px] bg-white transition-all outline-none"/>
+              <button id="btn-toggle-pwd" type="button" class="absolute right-3 top-2.5 text-on-surface-variant hover:text-primary">
+                <span class="material-symbols-outlined text-[20px]">visibility</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- SUBMIT BUTTON -->
+          <button id="btn-submit" type="submit" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-primary to-primary-container hover:from-primary-container hover:to-primary text-on-primary font-headline-md font-bold text-[14px] shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+            <span id="btn-submit-text">Sign In to BHARATGURU</span>
+            <span id="btn-submit-spinner" class="hidden material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
+          </button>
+
+        </form>
+
+        <!-- FOOTER LINKS -->
+        <div class="pt-2 text-center text-[12px] text-on-surface-variant space-y-2">
+          <p>
+            New here? Try the <strong class="text-on-surface">Instant Demo Access</strong> above — no account needed.
+          </p>
+          <p class="text-[11px] font-mono text-outline">
+            BHARATGURU runs 100% locally with zero subscription fees.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ======================== FOOTER ======================== -->
+  <footer class="py-6 border-t border-outline-variant/30 text-center text-[12px] text-on-surface-variant">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <span>BHARATGURU &copy; 2026 &bull; Adaptive Multilingual AI Learning System</span>
+      <div class="flex items-center gap-4 font-mono text-[11px]">
+        <span>FastAPI + SQLite</span>
+        <span>&bull;</span>
+        <span>Offline Fallback Ready</span>
+        <span>&bull;</span>
+        <span>12 Indian Languages</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/login.js"></script>
+</body>
+</html>

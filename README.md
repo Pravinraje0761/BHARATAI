@@ -12,6 +12,10 @@
 >
 > As the student learns, BHARATGURU questions them, **fingerprints cognitive misconceptions**, dynamically shifts teaching strategies, anchors explanations in familiar **Indian cultural metaphors**, checks citations with a **Hallucination Shield**, visualizes complex STEM concepts in an **interactive Three.js 3D Lab**, tracks cognitive mastery on a **Student Knowledge Graph**, computes an empirical **Learning DNA profile**, schedules reviews via **Ebbinghaus Spaced Repetition**, and equips educators with an **Institutional Teacher Dashboard**.
 
+> [!IMPORTANT]
+> 🏆 **HACKATHON JUDGES & EVALUATORS**:  
+> Evaluating BHARATGURU for a hackathon? Read our dedicated [**Hackathon Judging Guide & Evaluation Dossier (JUDGES_README.md)**](JUDGES_README.md) for 60-second quickstarts, 1-click instant demo accounts (`aarav` & `priya`), 5-minute guided feature tours, 0% vibe-coded technical proofs, and automated verification commands.
+
 ---
 
 ## 📑 Table of Contents

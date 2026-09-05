@@ -28,3 +28,6 @@ imageio-ffmpeg>=0.5.1   # bundles an ffmpeg binary when the OS has none
 streamlit>=1.35.0
 fastapi>=0.110.0
 uvicorn>=0.29.0
+python-multipart>=0.0.9   # FastAPI file upload / form parsing
+requests>=2.31.0          # Groq / NVIDIA NIM REST calls in src/llm.py
+firebase-admin>=7.5.0     # Firebase Authentication & Cloud Firestore backend

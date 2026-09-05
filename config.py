@@ -24,7 +24,48 @@ def _load_dotenv(path: Path) -> None:
         os.environ.setdefault(key, val)
 
 
+def reload_env() -> None:
+    """Reload environment variables from .env and update module-level configuration variables."""
+    dotenv_path = ROOT / ".env"
+    if dotenv_path.exists():
+        for raw in dotenv_path.read_text(encoding="utf-8").splitlines():
+            line = raw.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, _, val = line.partition("=")
+            key, val = key.strip(), val.strip().strip('"').strip("'")
+            os.environ[key] = val
+
+    global GROQ_API_KEY, GROQ_BASE_URL, GROQ_MODEL
+    global NVIDIA_API_KEY, NVIDIA_BASE_URL, NVIDIA_MODEL
+    global GEMINI_API_KEY, GEMINI_MODEL, LLM_MOCK
+    global FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_PROJECT_ID
+    global FIREBASE_STORAGE_BUCKET, FIREBASE_MESSAGING_SENDER_ID, FIREBASE_APP_ID
+    global FIREBASE_MEASUREMENT_ID, FIREBASE_SERVICE_ACCOUNT, FIREBASE_DATABASE_URL
+
+    GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
+    GROQ_BASE_URL = os.environ.get("GROQ_BASE_URL", "https://api.groq.com/openai/v1")
+    GROQ_MODEL = os.environ.get("GROQ_MODEL", "qwen/qwen3.8-27b")
+    NVIDIA_API_KEY = os.environ.get("NVIDIA_API_KEY", "")
+    NVIDIA_BASE_URL = os.environ.get("NVIDIA_BASE_URL", "https://integrate.api.nvidia.com/v1")
+    NVIDIA_MODEL = os.environ.get("NVIDIA_MODEL", "meta/llama-3.2-11b-vision-instruct")
+    GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+    GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-flash-latest")
+    LLM_MOCK = os.environ.get("LLM_MOCK", "0") == "1"
+
+    FIREBASE_API_KEY = os.environ.get("FIREBASE_API_KEY", "")
+    FIREBASE_AUTH_DOMAIN = os.environ.get("FIREBASE_AUTH_DOMAIN", "")
+    FIREBASE_PROJECT_ID = os.environ.get("FIREBASE_PROJECT_ID", "")
+    FIREBASE_STORAGE_BUCKET = os.environ.get("FIREBASE_STORAGE_BUCKET", "")
+    FIREBASE_MESSAGING_SENDER_ID = os.environ.get("FIREBASE_MESSAGING_SENDER_ID", "")
+    FIREBASE_APP_ID = os.environ.get("FIREBASE_APP_ID", "")
+    FIREBASE_MEASUREMENT_ID = os.environ.get("FIREBASE_MEASUREMENT_ID", "")
+    FIREBASE_SERVICE_ACCOUNT = os.environ.get("FIREBASE_SERVICE_ACCOUNT", "")
+    FIREBASE_DATABASE_URL = os.environ.get("FIREBASE_DATABASE_URL", "")
+
+
 _load_dotenv(ROOT / ".env")
+reload_env()
 
 # --- Groq LPU (Sub-Second Lightning Inference) ---
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
@@ -38,8 +79,26 @@ NVIDIA_MODEL = os.environ.get("NVIDIA_MODEL", "meta/llama-3.2-11b-vision-instruc
 
 # --- Gemini ---
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-flash-latest")
 LLM_MOCK = os.environ.get("LLM_MOCK", "0") == "1"
+
+# --- Firebase Cloud Backend ---
+FIREBASE_API_KEY = os.environ.get("FIREBASE_API_KEY", "")
+FIREBASE_AUTH_DOMAIN = os.environ.get("FIREBASE_AUTH_DOMAIN", "")
+FIREBASE_PROJECT_ID = os.environ.get("FIREBASE_PROJECT_ID", "")
+FIREBASE_STORAGE_BUCKET = os.environ.get("FIREBASE_STORAGE_BUCKET", "")
+FIREBASE_MESSAGING_SENDER_ID = os.environ.get("FIREBASE_MESSAGING_SENDER_ID", "")
+FIREBASE_APP_ID = os.environ.get("FIREBASE_APP_ID", "")
+FIREBASE_MEASUREMENT_ID = os.environ.get("FIREBASE_MEASUREMENT_ID", "")
+FIREBASE_SERVICE_ACCOUNT = os.environ.get("FIREBASE_SERVICE_ACCOUNT", "")
+FIREBASE_DATABASE_URL = os.environ.get("FIREBASE_DATABASE_URL", "")
+
+# --- Auth session cookie ---
+# Set COOKIE_SECURE=1 once the site is deployed behind HTTPS (browsers drop
+# Secure cookies over plain HTTP, so this stays off by default for local dev).
+COOKIE_SECURE = os.environ.get("COOKIE_SECURE", "0") == "1"
+SESSION_COOKIE_NAME = "bg_session"
+SESSION_TTL_DAYS = 30
 
 # --- Embeddings ---
 EMBED_MODEL = os.environ.get("EMBED_MODEL", "all-MiniLM-L6-v2")

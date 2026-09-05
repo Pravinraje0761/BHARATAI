@@ -15,10 +15,18 @@ class KnowledgeGraphVisualizer {
     this.selectedNode = null;
     this.animationId = null;
 
-    this.initDefaultData();
+    // Clean slate: start empty unless explicitly populated or demo mode
+    this.nodes = [];
+    this.links = [];
+    this.particles = [];
+
     this.resize();
     this.bindEvents();
     this.animate();
+  }
+
+  loadDemoCurriculum() {
+    this.initDefaultData();
   }
 
   initDefaultData() {
@@ -199,6 +207,30 @@ class KnowledgeGraphVisualizer {
       ctx.moveTo(0, y);
       ctx.lineTo(width, y);
       ctx.stroke();
+    }
+
+    // Clean Empty State: If no curriculum nodes have been loaded yet
+    if (this.nodes.length === 0) {
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      // Watermark Icon
+      ctx.font = '40px "Material Symbols Outlined", sans-serif';
+      ctx.fillStyle = '#adc7f7';
+      ctx.fillText('hub', width / 2, height / 2 - 34);
+
+      // Main Heading
+      ctx.font = 'bold 16px Inter, sans-serif';
+      ctx.fillStyle = '#002045';
+      ctx.fillText('Concept Dependency Graph Uninitialized', width / 2, height / 2 + 8);
+
+      // Informative Guidance
+      ctx.font = '500 12px Inter, sans-serif';
+      ctx.fillStyle = '#535f70';
+      ctx.fillText('Upload a chapter PDF or notes to generate this topic\'s interactive concept mastery map.', width / 2, height / 2 + 32);
+      ctx.restore();
+      return;
     }
 
     // Draw Links

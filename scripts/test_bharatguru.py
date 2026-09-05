@@ -190,14 +190,22 @@ def test_learning_dna_and_spaced_repetition():
 
 def test_teacher_dashboard():
     print("\n== [7] Testing Institutional Teacher Dashboard ==")
+    # Seed one real attempt so the cohort aggregation has something to report.
+    from src.knowledge_graph import KnowledgeGraphStore
+    kg = KnowledgeGraphStore()
+    kg.record_attempt("dash_probe", "Resistance and Ohm's law", is_correct=False,
+                      misconception="Current rises with resistance at constant voltage")
+    kg.close()
+
     overview = get_class_overview()
-    assert overview["total_enrolled"] == 42
-    assert len(overview["concepts_mastery"]) >= 3
-    assert len(overview["shared_misconceptions"]) >= 2
-    assert len(overview["recommended_remediations"]) >= 2
+    assert overview["data_available"] is True
+    assert overview["total_enrolled"] >= 1
+    assert len(overview["concepts_mastery"]) >= 1
+    assert all(0 <= c["mastery"] <= 100 for c in overview["concepts_mastery"])
     print(f"  [OK] Class: {overview['class_name']} ({overview['total_enrolled']} students, {overview['average_mastery']}% avg mastery)")
-    print(f"  [OK] Top shared misconception: '{overview['shared_misconceptions'][0]['misconception']}' ({overview['shared_misconceptions'][0]['affected_students']} students)")
-    print(f"  [OK] 1-Click Remediation: '{overview['recommended_remediations'][0]['title']}'")
+    if overview["shared_misconceptions"]:
+        top = overview["shared_misconceptions"][0]
+        print(f"  [OK] Top shared misconception: '{top['misconception']}' ({top['affected_students']} students)")
 
 
 def test_fastapi_server_endpoints():
@@ -222,6 +230,12 @@ def test_fastapi_server_endpoints():
     assert "SOCRATIC" in presets["modes"]
     print(f"  [OK] /api/presets: {len(presets['presets'])} presets, {len(presets['modes'])} teaching modes")
 
+    # Authenticate client as teacher to exercise protected endpoints
+    r_auth = client.post("/api/auth/demo-login", json={"role": "teacher"})
+    assert r_auth.status_code == 200
+    token = r_auth.json().get("token")
+    client.headers["Authorization"] = f"Bearer {token}"
+
     # 3. Knowledge Graph
     r_kg = client.get("/api/knowledge-graph/student1")
     assert r_kg.status_code == 200
@@ -234,11 +248,14 @@ def test_fastapi_server_endpoints():
     assert "dominant_trait" in r_dna.json()
     print(f"  [OK] /api/student/dna/student1: dominant={r_dna.json()['dominant_trait']}")
 
-    # 5. Teacher Overview
+    # 5. Teacher Overview (real cohort aggregation from the knowledge-graph DB)
     r_t = client.get("/api/teacher/class-overview")
     assert r_t.status_code == 200
-    assert r_t.json()["total_enrolled"] == 42
-    print(f"  [OK] /api/teacher/class-overview: verified 42 students cohort")
+    t_json = r_t.json()
+    assert "data_available" in t_json and "total_enrolled" in t_json
+    assert isinstance(t_json["concepts_mastery"], list)
+    print(f"  [OK] /api/teacher/class-overview: {t_json['total_enrolled']} real students, "
+          f"data_available={t_json['data_available']}")
 
     # 6. Socratic Turn
     r_soc = client.post("/api/session/socratic", json={

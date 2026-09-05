@@ -4,8 +4,17 @@
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <title>BHARATGURU — Adaptive Multilingual AI Learning System</title>
+  <meta name="description" content="BHARATGURU adapts to how each Indian student learns — Socratic AI tutoring, misconception diagnosis, and a 3D STEM lab in 12 Indian languages, mapped to CBSE, JEE and NEET syllabi."/>
+  <meta property="og:title" content="BHARATGURU — Adaptive Multilingual AI Learning System"/>
+  <meta property="og:description" content="Socratic AI tutoring, misconception diagnosis, and a 3D STEM lab in 12 Indian languages, mapped to CBSE, JEE and NEET syllabi."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:image" content="/favicon.svg"/>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&family=OpenDyslexic&display=swap" rel="stylesheet"/>
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+  <!-- Firebase Web SDK & Analytics -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -139,11 +148,28 @@
         <a class="nav-tab text-[14px] text-primary font-bold border-b-2 border-primary pb-1" data-target="view-knowledge-graph" href="#">Knowledge Graph</a>
         <a class="nav-tab text-[14px] text-on-surface-variant hover:text-primary transition-colors pb-1" data-target="view-learning-dna" href="#">Learning DNA</a>
         <a class="nav-tab text-[14px] text-on-surface-variant hover:text-primary transition-colors pb-1" data-target="view-spaced-repetition" href="#">Spaced Repetition</a>
-        <a class="nav-tab text-[14px] text-on-surface-variant hover:text-primary transition-colors pb-1" data-target="view-teacher-dashboard" href="#">Teacher Dashboard</a>
+        <a class="nav-tab text-[14px] text-on-surface-variant hover:text-primary transition-colors pb-1" data-target="view-teacher-dashboard" data-role="teacher-only" href="#">Teacher Dashboard</a>
+        <a id="nav-tab-completion" class="nav-tab hidden text-[14px] text-emerald-700 font-bold hover:text-primary transition-colors pb-1 items-center gap-1" data-target="view-lesson-completed" href="#">
+          <span class="material-symbols-outlined text-[16px] text-emerald-600">verified</span>
+          <span>Completion</span>
+        </a>
       </nav>
       
-      <!-- Accessibility Toolbar & Student Profile -->
+      <!-- Accessibility Toolbar, Role Switcher & Student Profile -->
       <div class="flex items-center gap-3">
+        <!-- Credits Balance Badge -->
+        <div id="user-credits-badge" class="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 font-mono text-[12px] font-bold shadow-xs select-none" title="Your Bharat AI Studio Credits: 1 Credit for Fast Express, 5 Credits for Photorealistic 3D Studio">
+          <span>🪙</span>
+          <span id="credits-amount">100</span>
+          <span class="text-[10px] text-amber-700 font-semibold hidden sm:inline">Credits</span>
+        </div>
+
+        <!-- Quick Demo Role Switcher (Swap between Student and Teacher in 1 click) -->
+        <button id="btn-quick-role-switch" class="hidden items-center gap-1.5 px-3 py-1.5 rounded-xl border border-secondary/40 bg-secondary/10 hover:bg-secondary hover:text-white text-secondary text-[12px] font-bold transition-all shadow-sm cursor-pointer" title="Instant 1-Click Role Swap">
+          <span class="material-symbols-outlined text-[16px]">swap_horiz</span>
+          <span id="role-switch-label">Switch to Teacher View</span>
+        </button>
+
         <!-- Accessibility Dropdown / Toggles -->
         <div class="flex items-center gap-1.5 bg-surface-container px-2 py-1 rounded-xl border border-outline-variant/40 text-[12px]">
           <button id="btn-toggle-dyslexia" title="Toggle Dyslexia-friendly font" class="p-1 rounded-lg hover:bg-surface text-on-surface-variant hover:text-primary transition-colors">
@@ -159,7 +185,53 @@
           </select>
         </div>
 
-        <span class="text-[12px] font-mono bg-primary/10 text-primary px-3 py-1.5 rounded-full font-semibold">Student: <strong>student1</strong></span>
+        <!-- User Auth Profile Pill & Dropdown / Sign In Link -->
+        <div id="auth-header-container" class="relative">
+          <!-- Unauthenticated state: Sign In Button -->
+          <div id="auth-unauthenticated" class="flex items-center gap-2">
+            <a href="/login.html" class="flex items-center gap-1.5 text-[12px] font-bold bg-primary text-on-primary px-3.5 py-1.5 rounded-xl hover:bg-primary-container transition-all shadow-sm">
+              <span class="material-symbols-outlined text-[16px]">account_circle</span>
+              <span>Sign In</span>
+            </a>
+          </div>
+
+          <!-- Authenticated state: Profile Chip with Dropdown -->
+          <div id="auth-authenticated" class="hidden relative">
+            <button id="btn-user-menu" class="flex items-center gap-2 bg-surface-container hover:bg-surface-container-high border border-outline-variant/40 px-3 py-1.5 rounded-xl transition-all cursor-pointer">
+              <span id="user-avatar-badge" class="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[13px] font-bold overflow-hidden shrink-0 border border-outline-variant/30">👨‍🎓</span>
+              <div class="text-left hidden sm:block max-w-[140px]">
+                <span id="user-display-name" class="block text-[12px] font-bold text-on-surface leading-tight truncate">Student</span>
+                <span id="user-role-badge" class="block text-[10px] font-mono text-on-surface-variant leading-tight truncate">Student</span>
+              </div>
+              <span class="material-symbols-outlined text-[16px] text-on-surface-variant">expand_more</span>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div id="user-dropdown-menu" class="hidden absolute right-0 mt-2 w-56 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-outline-variant/30 py-2 z-[70] animate-fade-in">
+              <div class="px-4 py-2 border-b border-outline-variant/20">
+                <span class="block text-[10px] font-mono text-on-surface-variant uppercase font-semibold">Signed In As</span>
+                <span id="dropdown-username" class="block text-[13px] font-bold text-primary truncate">student</span>
+                <span id="dropdown-email" class="block text-[11px] text-on-surface-variant truncate">user@bharatguru.edu</span>
+              </div>
+              <div class="py-1">
+                <a id="link-my-classroom" href="#" class="flex items-center gap-2 px-4 py-2 text-[13px] text-on-surface hover:bg-surface-container transition-colors">
+                  <span class="material-symbols-outlined text-[18px] text-primary">school</span>
+                  <span>My Adaptive Classroom</span>
+                </a>
+                <a id="link-teacher-dashboard" href="#" class="flex items-center gap-2 px-4 py-2 text-[13px] text-on-surface hover:bg-surface-container transition-colors">
+                  <span class="material-symbols-outlined text-[18px] text-secondary">analytics</span>
+                  <span>Teacher Cohort Dashboard</span>
+                </a>
+              </div>
+              <div class="pt-1 border-t border-outline-variant/20">
+                <button id="btn-header-logout" class="w-full flex items-center gap-2 px-4 py-2 text-[13px] text-red-600 hover:bg-red-50 transition-colors text-left cursor-pointer">
+                  <span class="material-symbols-outlined text-[18px]">logout</span>
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -243,13 +315,18 @@
             </h3>
 
             <div class="space-y-1">
+              <label class="font-label-md text-[11px] text-on-surface-variant uppercase font-semibold">Your Name</label>
+              <input id="student-name-input" type="text" placeholder="e.g. Aarav (keeps your progress, graph & report separate)" class="w-full bg-surface border border-outline-variant rounded-xl px-4 py-2 text-on-surface focus:border-primary focus:outline-none text-[14px]" />
+            </div>
+
+            <div class="space-y-1">
               <label class="font-label-md text-[11px] text-on-surface-variant uppercase font-semibold">Topic / Concept</label>
               <input id="topic-input" type="text" placeholder="e.g. Chapter 4: Electricity or Newton's Laws of Motion" class="w-full bg-surface border border-outline-variant rounded-xl px-4 py-2 text-on-surface focus:border-primary focus:outline-none text-[14px]" />
             </div>
 
             <div class="space-y-1">
               <label class="font-label-md text-[11px] text-on-surface-variant uppercase font-semibold">Instruction / Goal</label>
-              <textarea id="instruction-input" rows="2" class="w-full bg-surface border border-outline-variant rounded-xl px-4 py-2 text-on-surface focus:border-primary focus:outline-none text-[13px]">I am a beginner, teach me in 20 minutes, in English, with simple real-world examples</textarea>
+              <textarea id="instruction-input" rows="2" placeholder="e.g. I am a beginner, teach me in 20 minutes with simple examples (or choose a preset above)" class="w-full bg-surface border border-outline-variant rounded-xl px-4 py-2 text-on-surface focus:border-primary focus:outline-none text-[13px]"></textarea>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
@@ -281,7 +358,7 @@
                   <option value="Marathi">Marathi (मराठी)</option>
                   <option value="Gujarati">Gujarati (ગુજરાતી)</option>
                   <option value="Punjabi">Punjabi (ਪੰਜਾਬੀ)</option>
-                  <option value="Odia">Odia (ଓଡ଼ିଆ)</option>
+                  <option value="Urdu">Urdu (اردو)</option>
                 </select>
               </div>
             </div>
@@ -309,7 +386,41 @@
               </div>
             </div>
 
-            <button id="btn-build-lesson" class="w-full bg-primary text-on-primary font-headline-md font-bold py-3 px-6 rounded-xl hover:scale-[1.01] transition-all shadow-md flex items-center justify-center gap-2">
+            <!-- Visual Studio Quality & Realistic Teacher Studio (Credit Tier) -->
+            <div class="space-y-1.5 pt-1">
+              <label class="font-label-md text-[11px] text-on-surface-variant uppercase font-semibold flex items-center justify-between">
+                <span>Visual Studio Quality &amp; AI Teacher</span>
+                <span class="text-secondary font-mono text-[10px]">Tier Options</span>
+              </label>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="tier-selector-container">
+                <!-- Option 1: Express Mode (1 Credit) -->
+                <label class="tier-card p-3 rounded-xl border-2 border-primary bg-primary/5 cursor-pointer transition-all flex items-start gap-2.5 relative" data-tier="express">
+                  <input type="radio" name="production_tier" value="express" checked class="mt-1 accent-primary" />
+                  <div class="space-y-0.5">
+                    <div class="flex items-center gap-1.5">
+                      <span class="font-headline-md text-[13px] font-bold text-primary">⚡ Fast &amp; Express</span>
+                      <span class="px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-mono font-bold">1 Credit</span>
+                    </div>
+                    <p class="text-[11px] text-on-surface-variant leading-tight">Instant neural speech + diagram slides (~3s).</p>
+                  </div>
+                </label>
+
+                <!-- Option 2: Ultra Realistic Studio (5 Credits) -->
+                <label class="tier-card p-3 rounded-xl border-2 border-outline-variant/60 bg-surface hover:border-secondary cursor-pointer transition-all flex items-start gap-2.5 relative" data-tier="realistic">
+                  <input type="radio" name="production_tier" value="realistic" class="mt-1 accent-secondary" />
+                  <div class="space-y-0.5">
+                    <div class="flex items-center gap-1.5">
+                      <span class="font-headline-md text-[13px] font-bold text-secondary">✨ Realistic Studio</span>
+                      <span class="px-1.5 py-0.2 rounded-full bg-secondary/15 text-secondary text-[10px] font-mono font-bold">5 Credits</span>
+                    </div>
+                    <p class="text-[11px] text-on-surface-variant leading-tight">Realistic teacher avatar, 3D STEM lab &amp; cinema visuals (~15s).</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <button id="btn-build-lesson" class="w-full bg-primary text-on-primary font-headline-md font-bold py-3 px-6 rounded-xl hover:scale-[1.01] transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
               <span class="material-symbols-outlined">auto_awesome</span>
               Build Adaptive Lesson Plan
             </button>
@@ -345,9 +456,16 @@
 
           <!-- Classroom Actions & Language Switcher -->
           <div class="flex items-center gap-3">
-            <button id="btn-open-3d-from-classroom" class="px-3 py-1.5 rounded-xl bg-secondary/10 hover:bg-secondary hover:text-on-secondary text-secondary border border-secondary/20 text-[12px] font-mono font-bold flex items-center gap-1.5 transition-all shadow-sm">
+            <button id="btn-open-3d-from-classroom" class="px-3 py-1.5 rounded-xl bg-secondary/10 hover:bg-secondary hover:text-on-secondary text-secondary border border-secondary/20 text-[12px] font-mono font-bold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer">
               <span class="material-symbols-outlined text-[16px]">view_in_ar</span>
               Inspect in 3D Lab
+            </button>
+
+            <!-- Mid-Lesson Realistic Teacher Upgrade Button -->
+            <button id="btn-upgrade-realistic-studio" class="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-[12px] font-mono font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer" title="Upgrade this concept to a Photorealistic AI Teacher Avatar & 3D STEM Lab Simulation (Costs 5 Credits)">
+              <span>✨</span>
+              <span id="label-upgrade-studio">Realistic Teacher</span>
+              <span class="px-1.5 py-0.2 rounded-md bg-amber-200 text-amber-900 text-[10px] font-mono font-bold">5 🪙</span>
             </button>
 
             <!-- Mid-Lesson Language Switcher Pills -->
@@ -401,11 +519,22 @@
             </div>
 
             <!-- Spoken Script Transcript -->
-            <div class="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/30 space-y-2">
-              <h4 class="font-headline-md text-[14px] font-bold text-on-surface flex items-center gap-2">
-                <span class="material-symbols-outlined text-primary text-[18px]">chat</span>
-                Teacher Narration
-              </h4>
+            <div class="bg-surface-container-low p-6 rounded-2xl border border-outline-variant/30 space-y-2 card-interactive">
+              <div class="flex items-center justify-between">
+                <h4 class="font-headline-md text-[14px] font-bold text-on-surface flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary text-[18px]">chat</span>
+                  Teacher Narration
+                </h4>
+                <div id="classroom-audio-visualizer" class="hidden items-center gap-1 h-6 px-2.5 py-0.5 rounded-full bg-secondary/10 border border-secondary/20">
+                  <span class="audio-wave-bar"></span>
+                  <span class="audio-wave-bar"></span>
+                  <span class="audio-wave-bar"></span>
+                  <span class="audio-wave-bar"></span>
+                  <span class="audio-wave-bar"></span>
+                  <span class="audio-wave-bar"></span>
+                  <span class="text-[10px] font-mono font-bold text-secondary ml-1">AI Voice Active</span>
+                </div>
+              </div>
               <p id="classroom-explanation-text" class="text-on-surface text-[15px] leading-relaxed"></p>
             </div>
 
@@ -550,6 +679,9 @@
             <button class="model-3d-btn px-3.5 py-1.5 rounded-xl bg-primary text-on-primary text-[12px] font-bold transition-all shadow-sm flex items-center gap-1.5" data-model="dna">
               🧬 DNA Double Helix
             </button>
+            <button class="model-3d-btn px-3.5 py-1.5 rounded-xl bg-surface border border-outline-variant hover:bg-surface-container text-on-surface text-[12px] font-bold transition-all shadow-sm flex items-center gap-1.5" data-model="eye">
+              👁️ Human Eye
+            </button>
             <button class="model-3d-btn px-3.5 py-1.5 rounded-xl bg-surface border border-outline-variant hover:bg-surface-container text-on-surface text-[12px] font-bold transition-all shadow-sm flex items-center gap-1.5" data-model="water">
               💧 Water Molecule (H₂O)
             </button>
@@ -643,7 +775,7 @@
                 <span class="material-symbols-outlined text-secondary text-[18px]">psychology</span>
                 Pedagogical Reflection
               </span>
-              <p class="text-[12px] text-on-surface leading-relaxed">
+              <p id="3d-pedagogical-reflection" class="text-[12px] text-on-surface leading-relaxed">
                 Notice how the complementary purine-pyrimidine base pairs (A=T with two hydrogen bonds, G≡C with three) ensure the outer backbones remain exactly 2.0 nanometers apart throughout the entire helical twist!
               </p>
             </div>
@@ -652,7 +784,7 @@
       </section>
 
       <!-- ==================== VIEW 4: STUDENT KNOWLEDGE GRAPH (LIVE) ==================== -->
-      <section id="view-knowledge-graph" class="max-w-6xl mx-auto space-y-6 animate-fade-in">
+      <section id="view-knowledge-graph" class="hidden max-w-6xl mx-auto space-y-6 animate-fade-in">
         
         <!-- KPI Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -662,7 +794,7 @@
             </div>
             <div>
               <p class="font-label-md text-[11px] text-on-surface-variant uppercase tracking-wider">Overall Mastery</p>
-              <p id="kg-overall-mastery" class="font-headline-lg text-[26px] font-bold text-on-surface">68.4%</p>
+              <p id="kg-overall-mastery" class="font-headline-lg text-[26px] font-bold text-on-surface">--%</p>
               <p class="text-[11px] text-on-surface-variant">Cognitive skill index</p>
             </div>
           </div>
@@ -673,7 +805,7 @@
             </div>
             <div>
               <p class="font-label-md text-[11px] text-on-surface-variant uppercase tracking-wider">Mastered Concepts</p>
-              <p id="kg-mastered-count" class="font-headline-lg text-[26px] font-bold text-on-surface">7 / 12</p>
+              <p id="kg-mastered-count" class="font-headline-lg text-[26px] font-bold text-on-surface">0 / 0</p>
               <p class="text-[11px] text-on-surface-variant">Above 75% retention threshold</p>
             </div>
           </div>
@@ -684,7 +816,7 @@
             </div>
             <div>
               <p class="font-label-md text-[11px] text-on-surface-variant uppercase tracking-wider">Active Misconceptions</p>
-              <p id="kg-misconceptions-count" class="font-headline-lg text-[26px] font-bold text-on-surface">1 In Progress</p>
+              <p id="kg-misconceptions-count" class="font-headline-lg text-[26px] font-bold text-on-surface">0 Tracked</p>
               <p class="text-[11px] text-on-surface-variant">Tracked by Misconception Engine™</p>
             </div>
           </div>
@@ -773,6 +905,39 @@
           <span class="bg-secondary/15 text-secondary font-mono text-[12px] font-bold px-3 py-1 rounded-full">AI Intervention Engine Active</span>
         </div>
 
+        <!-- STUDENT COHORT ROSTER & "HOW TO TEACH THEM" GUIDANCE (TEACHER EXCLUSIVE) -->
+        <div class="bg-gradient-to-r from-primary-container/10 via-surface-container to-secondary-container/10 rounded-2xl p-6 border border-outline-variant/40 space-y-5 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-outline-variant/30 pb-4">
+            <div>
+              <h3 class="font-headline-md text-[18px] font-bold text-primary flex items-center gap-2">
+                <span class="material-symbols-outlined text-secondary text-[24px]">psychology_alt</span>
+                Student Cohort Roster &amp; "How to Teach Them" Guidance
+              </h3>
+              <p class="text-[13px] text-on-surface-variant">Select any student to inspect their exact mastery gaps, cognitive fingerprints, and tailored pedagogical prescriptions.</p>
+            </div>
+            <span class="text-[11px] font-mono bg-secondary/15 text-secondary border border-secondary/30 px-3 py-1 rounded-full font-bold self-start flex items-center gap-1">
+              <span class="material-symbols-outlined text-[14px]">lock</span>
+              Teacher-Only Advisory
+            </span>
+          </div>
+
+          <!-- Student Selector Pills -->
+          <div class="space-y-2">
+            <span class="block text-[11px] font-mono text-on-surface-variant uppercase font-semibold">Select Student for Deep Cognitive Inspection:</span>
+            <div id="teacher-roster-selector" class="flex flex-wrap gap-2.5">
+              <!-- Loaded dynamically via /api/teacher/students-roster -->
+            </div>
+          </div>
+
+          <!-- Selected Student "How to Teach Them" Action Card -->
+          <div id="teacher-guidance-card" class="bg-white rounded-2xl p-5 border border-outline-variant/40 space-y-4 shadow-sm">
+            <div class="flex items-center justify-center p-8 text-on-surface-variant text-[13px]">
+              <span class="material-symbols-outlined text-[24px] animate-spin mr-2">sync</span>
+              Loading student pedagogical blueprint...
+            </div>
+          </div>
+        </div>
+
         <!-- Concept Risk Heatmap -->
         <div class="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/30 space-y-4">
           <h3 class="font-headline-md text-[17px] font-bold text-on-surface flex items-center gap-2">
@@ -819,7 +984,377 @@
         <div id="report-card-container" class="hidden bg-surface-container-low rounded-2xl p-8 border border-outline-variant/30 space-y-6 shadow-md"></div>
       </section>
 
+      <!-- ==================== VIEW 9: LESSON COMPLETION & OFFICIAL CERTIFICATE ==================== -->
+      <section id="view-lesson-completed" class="hidden max-w-5xl mx-auto space-y-10 animate-fade-in relative pb-16">
+        
+        <!-- Confetti Canvas (Falls across view during celebration) -->
+        <canvas id="completion-confetti-canvas" class="pointer-events-none absolute inset-0 w-full h-full z-10"></canvas>
+
+        <!-- CELEBRATORY HERO BANNER -->
+        <div id="completion-hero-section" class="relative bg-gradient-to-b from-primary-container/15 via-secondary-container/10 to-transparent p-8 sm:p-12 rounded-3xl border border-outline-variant/30 text-center space-y-4 shadow-sm overflow-hidden">
+          
+          <!-- Ambient Glow Blobs -->
+          <div class="absolute -top-12 -left-12 w-48 h-48 bg-secondary/15 rounded-full blur-3xl pointer-events-none"></div>
+          <div class="absolute -bottom-12 -right-12 w-48 h-48 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none"></div>
+
+          <!-- Bouncing Trophy Badge -->
+          <div class="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-tr from-secondary-container via-amber-400 to-amber-500 text-white shadow-xl mx-auto trophy-bounce text-[42px] select-none">
+            🏆
+          </div>
+
+          <div class="space-y-2 relative z-10">
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[12px] font-mono font-bold border border-emerald-300">
+              <span class="material-symbols-outlined text-[16px]">verified</span>
+              <span>100% Curriculum Completed &amp; Mastered</span>
+            </div>
+            <h1 id="completion-student-title" class="font-display-lg text-[32px] sm:text-[40px] font-extrabold text-primary tracking-tight">
+              Congratulations, Aarav! 🎉
+            </h1>
+            <p id="completion-lesson-subtitle" class="text-on-surface-variant text-[15px] sm:text-[17px] max-w-2xl mx-auto">
+              You've successfully completed all concept lessons and checkpoints in <strong class="text-primary font-bold">Electricity: Current, Voltage and Resistance</strong>.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-center gap-3 pt-2 relative z-10">
+            <span class="px-3.5 py-1.5 rounded-xl bg-white border border-outline-variant/40 text-on-surface text-[12px] font-mono font-semibold flex items-center gap-1.5 shadow-xs">
+              <span class="material-symbols-outlined text-secondary text-[16px]">school</span>
+              <span id="completion-badge-board">CBSE Board Class 10</span>
+            </span>
+            <span class="px-3.5 py-1.5 rounded-xl bg-white border border-outline-variant/40 text-on-surface text-[12px] font-mono font-semibold flex items-center gap-1.5 shadow-xs">
+              <span class="material-symbols-outlined text-primary text-[16px]">translate</span>
+              <span id="completion-badge-lang">English (Indic Neural Voice)</span>
+            </span>
+            <span class="px-3.5 py-1.5 rounded-xl bg-white border border-outline-variant/40 text-on-surface text-[12px] font-mono font-semibold flex items-center gap-1.5 shadow-xs">
+              <span class="material-symbols-outlined text-emerald-600 text-[16px]">psychology</span>
+              <span>SM-2 Memory Sync Complete</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- 4-CARD MASTERY & SESSION SCOREBOARD -->
+        <div id="completion-scoreboard-section" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-surface-container-low p-5 rounded-2xl border border-outline-variant/30 space-y-2 card-interactive shadow-xs">
+            <div class="flex items-center justify-between text-on-surface-variant">
+              <span class="font-label-md text-[11px] uppercase font-bold tracking-wider">Lessons Finished</span>
+              <span class="material-symbols-outlined text-primary text-[22px]">fact_check</span>
+            </div>
+            <div class="text-[26px] font-headline-lg font-bold text-primary" id="completion-stat-segments">
+              5 / 5
+            </div>
+            <div class="w-full bg-surface h-1.5 rounded-full overflow-hidden">
+              <div class="bg-primary h-full rounded-full w-full"></div>
+            </div>
+            <p class="text-[11px] font-mono text-emerald-700 font-semibold">✓ 100% Milestones Conquered</p>
+          </div>
+
+          <div class="bg-surface-container-low p-5 rounded-2xl border border-outline-variant/30 space-y-2 card-interactive shadow-xs">
+            <div class="flex items-center justify-between text-on-surface-variant">
+              <span class="font-label-md text-[11px] uppercase font-bold tracking-wider">Concept Mastery</span>
+              <span class="material-symbols-outlined text-secondary text-[22px]">insights</span>
+            </div>
+            <div class="text-[26px] font-headline-lg font-bold text-secondary" id="completion-stat-mastery">
+              96%
+            </div>
+            <div class="w-full bg-surface h-1.5 rounded-full overflow-hidden">
+              <div class="bg-secondary h-full rounded-full" style="width: 96%"></div>
+            </div>
+            <p class="text-[11px] font-mono text-on-surface-variant">Knowledge Graph Synced</p>
+          </div>
+
+          <div class="bg-surface-container-low p-5 rounded-2xl border border-outline-variant/30 space-y-2 card-interactive shadow-xs">
+            <div class="flex items-center justify-between text-on-surface-variant">
+              <span class="font-label-md text-[11px] uppercase font-bold tracking-wider">Checkpoint Accuracy</span>
+              <span class="material-symbols-outlined text-amber-600 text-[22px]">local_fire_department</span>
+            </div>
+            <div class="text-[26px] font-headline-lg font-bold text-amber-700" id="completion-stat-accuracy">
+              100% 🔥
+            </div>
+            <div class="w-full bg-surface h-1.5 rounded-full overflow-hidden">
+              <div class="bg-amber-500 h-full rounded-full w-full"></div>
+            </div>
+            <p class="text-[11px] font-mono text-on-surface-variant" id="completion-stat-streak-label">Zero misconceptions uncorrected</p>
+          </div>
+
+          <div class="bg-surface-container-low p-5 rounded-2xl border border-outline-variant/30 space-y-2 card-interactive shadow-xs">
+            <div class="flex items-center justify-between text-on-surface-variant">
+              <span class="font-label-md text-[11px] uppercase font-bold tracking-wider">Retention Status</span>
+              <span class="material-symbols-outlined text-emerald-600 text-[22px]">event_repeat</span>
+            </div>
+            <div class="text-[22px] font-headline-lg font-bold text-emerald-800 flex items-center gap-1">
+              <span>Ready</span>
+              <span class="material-symbols-outlined text-[18px]">bolt</span>
+            </div>
+            <div class="w-full bg-surface h-1.5 rounded-full overflow-hidden">
+              <div class="bg-emerald-600 h-full rounded-full w-full"></div>
+            </div>
+            <p class="text-[11px] font-mono text-on-surface-variant">Flashcards in Spaced Repetition</p>
+          </div>
+        </div>
+
+        <!-- CONQUERED CONCEPTS & ANALOGIES BREAKDOWN -->
+        <div id="completion-concepts-section" class="bg-surface-container-low p-6 sm:p-8 rounded-3xl border border-outline-variant/30 space-y-5 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-outline-variant/30 pb-4">
+            <div>
+              <h3 class="font-headline-md text-[19px] font-bold text-on-surface flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-[24px]">checklist_rtl</span>
+                <span>Concepts Mastered in this Lesson</span>
+              </h3>
+              <p class="text-[13px] text-on-surface-variant">Review all the core scientific principles and real-world Indian analogies you conquered today:</p>
+            </div>
+            <span class="text-[11px] font-mono bg-primary/10 text-primary px-3 py-1 rounded-full font-bold self-start">
+              Curriculum Grounded
+            </span>
+          </div>
+
+          <div id="completion-concepts-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Dynamically populated by renderLessonCompletionView -->
+          </div>
+        </div>
+
+        <!-- OFFICIAL PRINTABLE / DOWNLOADABLE CERTIFICATE OF ACHIEVEMENT -->
+        <div id="certificate-printable-area" class="certificate-container rounded-3xl p-8 sm:p-14 text-center relative overflow-hidden shadow-2xl space-y-6">
+          
+          <!-- Large Background Watermark Icon -->
+          <div class="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none text-primary">
+            <span class="material-symbols-outlined text-[380px]">school</span>
+          </div>
+
+          <!-- Header Brand & Seal Row -->
+          <div class="flex items-center justify-between border-b-2 border-secondary/20 pb-5 relative z-10">
+            <div class="text-left">
+              <div class="flex items-center gap-2">
+                <span class="font-headline-md text-[18px] sm:text-[22px] font-extrabold text-primary tracking-tight">BHARATGURU ACADEMIX</span>
+                <span class="bg-secondary/15 text-secondary text-[10px] font-mono font-bold px-2 py-0.5 rounded-full border border-secondary/30">AI CERTIFIED</span>
+              </div>
+              <p class="text-[11px] sm:text-[12px] font-mono text-on-surface-variant mt-0.5">Adaptive Multilingual STEM Learning System • National Curriculum Aligned</p>
+            </div>
+            <div class="certificate-seal w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center text-white shadow-lg shrink-0">
+              <span class="material-symbols-outlined text-[24px] sm:text-[28px]">verified</span>
+            </div>
+          </div>
+
+          <!-- Main Certificate Copy -->
+          <div class="space-y-4 py-2 relative z-10">
+            <span class="font-label-md text-[12px] sm:text-[13px] tracking-[0.25em] text-secondary uppercase font-bold block">
+              CERTIFICATE OF COMPLETION &amp; MASTERY
+            </span>
+
+            <p class="text-[14px] text-on-surface-variant italic font-serif">
+              This is to officially certify that
+            </p>
+
+            <div>
+              <h2 id="cert-student-name" class="font-display-lg text-[32px] sm:text-[42px] font-extrabold text-primary tracking-wide uppercase inline-block border-b-2 border-secondary/50 px-8 pb-1">
+                Aarav Sharma
+              </h2>
+            </div>
+
+            <p class="text-[14px] text-on-surface-variant max-w-xl mx-auto leading-relaxed">
+              has successfully studied, answered every checkpoint inquiry, and demonstrated first-principles mastery in:
+            </p>
+
+            <div class="p-4 rounded-2xl bg-primary/5 border border-primary/20 max-w-2xl mx-auto">
+              <h3 id="cert-lesson-title" class="font-headline-md text-[20px] sm:text-[24px] font-bold text-primary">
+                Chapter 4: Electricity — Current, Voltage and Resistance
+              </h3>
+            </div>
+
+            <!-- Meta Pill Attributes -->
+            <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-[12px] font-mono text-on-surface-variant pt-2">
+              <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px] text-primary">calendar_today</span>
+                <span>Date: <strong id="cert-issue-date" class="text-on-surface">September 4, 2026</strong></span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px] text-primary">gavel</span>
+                <span>Syllabus: <strong id="cert-board-name" class="text-on-surface">CBSE Board Class 10</strong></span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px] text-primary">language</span>
+                <span>Language: <strong id="cert-language-name" class="text-on-surface">English</strong></span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[16px] text-emerald-600">military_tech</span>
+                <span>Evaluation: <strong id="cert-grade-badge" class="text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full font-bold">A+ (Mastered)</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Signatures & Verification Hash Footer -->
+          <div class="pt-6 border-t-2 border-secondary/20 flex flex-col sm:flex-row items-center justify-between gap-4 text-left relative z-10">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-secondary text-[22px]">draw</span>
+                <span class="font-headline-md text-[14px] font-bold text-primary">BharatGuru Cognitive AI Engine</span>
+              </div>
+              <span class="text-[10px] font-mono text-on-surface-variant block">Algorithmic Verification &amp; Socratic Grounding Token</span>
+            </div>
+
+            <div class="text-center sm:text-right">
+              <span class="block font-mono text-[11px] font-bold text-primary" id="cert-verification-id">
+                VERIFICATION ID: BG-CERT-9A82E3
+              </span>
+              <span class="block text-[10px] font-mono text-emerald-700 font-semibold">
+                ✓ Cryptographically Stored in Local Session Ledger
+              </span>
+            </div>
+          </div>
+
+          <!-- Action Buttons (Hidden during Print) -->
+          <div class="pt-4 flex flex-wrap items-center justify-center gap-3 no-print">
+            <button id="btn-print-certificate" class="bg-primary hover:bg-primary-container text-on-primary font-headline-md font-bold px-6 py-3 rounded-xl transition-all shadow-md flex items-center gap-2 cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">print</span>
+              <span>Print / Save Certificate as PDF</span>
+            </button>
+            <button id="btn-share-certificate" class="bg-surface hover:bg-surface-container text-on-surface border border-outline-variant font-headline-md font-bold px-5 py-3 rounded-xl transition-all shadow-sm flex items-center gap-2 cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">share</span>
+              <span>Share Achievement</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- NEXT STEPS & RETENTION ACTIONS BAR (Hidden during Print) -->
+        <div id="completion-actions-bar" class="no-print space-y-6">
+          
+          <div class="bg-surface-container-low p-6 sm:p-8 rounded-3xl border border-outline-variant/30 space-y-5 shadow-sm">
+            <h3 class="font-headline-md text-[18px] font-bold text-on-surface flex items-center gap-2">
+              <span class="material-symbols-outlined text-secondary text-[22px]">rocket_launch</span>
+              <span>Keep Your Momentum Going (Next Actions)</span>
+            </h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              
+              <!-- 1. Take / Review Formative Quiz -->
+              <button id="btn-completion-quiz" class="p-4 rounded-2xl bg-white border border-outline-variant/40 hover:border-primary hover:shadow-md transition-all text-left space-y-2 group cursor-pointer">
+                <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <span class="material-symbols-outlined text-[20px]">quiz</span>
+                </div>
+                <div>
+                  <h4 class="font-headline-md text-[14px] font-bold text-on-surface group-hover:text-primary">Mastery Quiz</h4>
+                  <p class="text-[12px] text-on-surface-variant mt-0.5" id="completion-quiz-btn-subtitle">Take the 2-min exam check to certify your score</p>
+                </div>
+              </button>
+
+              <!-- 2. Spaced Repetition -->
+              <button id="btn-completion-spaced-rep" class="p-4 rounded-2xl bg-white border border-outline-variant/40 hover:border-secondary hover:shadow-md transition-all text-left space-y-2 group cursor-pointer">
+                <div class="w-10 h-10 rounded-xl bg-secondary/10 text-secondary flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <span class="material-symbols-outlined text-[20px]">psychology_alt</span>
+                </div>
+                <div>
+                  <h4 class="font-headline-md text-[14px] font-bold text-on-surface group-hover:text-secondary">Flashcard Queue</h4>
+                  <p class="text-[12px] text-on-surface-variant mt-0.5">Review Ebbinghaus cards scheduled for retention</p>
+                </div>
+              </button>
+
+              <!-- 3. Knowledge Graph -->
+              <button id="btn-completion-knowledge-graph" class="p-4 rounded-2xl bg-white border border-outline-variant/40 hover:border-primary hover:shadow-md transition-all text-left space-y-2 group cursor-pointer">
+                <div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <span class="material-symbols-outlined text-[20px]">hub</span>
+                </div>
+                <div>
+                  <h4 class="font-headline-md text-[14px] font-bold text-on-surface group-hover:text-primary">Knowledge Graph</h4>
+                  <p class="text-[12px] text-on-surface-variant mt-0.5">Inspect your updated synaptic mastery nodes</p>
+                </div>
+              </button>
+
+              <!-- 4. Printable Revision Notes -->
+              <button id="btn-completion-notes" class="p-4 rounded-2xl bg-white border border-outline-variant/40 hover:border-emerald-600 hover:shadow-md transition-all text-left space-y-2 group cursor-pointer">
+                <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <span class="material-symbols-outlined text-[20px]">menu_book</span>
+                </div>
+                <div>
+                  <h4 class="font-headline-md text-[14px] font-bold text-on-surface group-hover:text-emerald-800">Revision Sheet</h4>
+                  <p class="text-[12px] text-on-surface-variant mt-0.5">Open printable cheat sheet for this lesson</p>
+                </div>
+              </button>
+            </div>
+
+            <!-- Recommended Next Topic Banner -->
+            <div id="completion-next-topic-card" class="bg-gradient-to-r from-primary-container/15 via-secondary-container/15 to-primary-container/10 p-5 rounded-2xl border border-outline-variant/40 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="space-y-1">
+                <span class="font-mono text-[11px] font-bold text-secondary uppercase tracking-wide">Recommended Next Lesson in Syllabus:</span>
+                <h4 id="completion-next-topic-title" class="font-headline-md text-[16px] font-bold text-primary">
+                  Series and Parallel Resistor Circuits (CBSE Class 10)
+                </h4>
+                <p id="completion-next-topic-reason" class="text-[12px] text-on-surface-variant">
+                  Natural continuation building on your mastery of Current and Voltage.
+                </p>
+              </div>
+
+              <button id="btn-start-next-lesson" class="px-5 py-2.5 rounded-xl bg-secondary hover:bg-secondary/90 text-on-secondary font-headline-md font-bold text-[13px] flex items-center gap-2 shrink-0 transition-all shadow-sm cursor-pointer">
+                <span>Start Next Lesson</span>
+                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+
     </main>
+  </div>
+
+  <!-- MULTI-STEP ANIMATED LESSON PLANNING PROGRESS MODAL -->
+  <div id="modal-planning-progress" class="fixed inset-0 bg-primary/70 backdrop-blur-md z-[120] hidden flex items-center justify-center p-4 transition-all">
+    <div class="bg-white/95 backdrop-blur-2xl rounded-3xl max-w-md w-full p-6 sm:p-8 border border-white/40 space-y-6 shadow-2xl relative overflow-hidden animate-fade-in">
+      
+      <!-- Ambient Glow Decorator -->
+      <div class="absolute -top-16 -right-16 w-36 h-36 bg-secondary/20 rounded-full blur-2xl pointer-events-none"></div>
+      <div class="absolute -bottom-16 -left-16 w-36 h-36 bg-primary/15 rounded-full blur-2xl pointer-events-none"></div>
+
+      <div class="text-center space-y-2 relative z-10">
+        <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-primary to-primary-container text-white shadow-lg mx-auto float-slow">
+          <span class="material-symbols-outlined text-[28px] animate-spin">auto_awesome</span>
+        </div>
+        <h3 class="font-headline-md text-[20px] font-bold text-primary tracking-tight" id="planning-modal-title">
+          Synthesizing Adaptive Lesson...
+        </h3>
+        <p class="text-[13px] text-on-surface-variant font-medium" id="planning-modal-subtitle">
+          Constructing personalized Indian STEM curriculum blueprint
+        </p>
+      </div>
+
+      <!-- Glowing Shimmer Progress Bar -->
+      <div class="space-y-2 relative z-10">
+        <div class="flex justify-between text-[11px] font-mono font-bold text-on-surface-variant">
+          <span id="planning-progress-label">Phase 1 of 4</span>
+          <span id="planning-progress-percent" class="text-secondary font-bold">25%</span>
+        </div>
+        <div class="w-full h-2.5 bg-surface-container rounded-full overflow-hidden p-0.5 border border-outline-variant/30">
+          <div id="planning-progress-fill" class="h-full bg-gradient-to-r from-secondary via-secondary-container to-emerald-500 rounded-full transition-all duration-500 w-1/4 bg-shimmer"></div>
+        </div>
+      </div>
+
+      <!-- Dynamic Step List -->
+      <div class="space-y-2.5 relative z-10 text-[13px]" id="planning-steps-list">
+        <div id="step-plan-1" class="flex items-center gap-3 p-2.5 rounded-xl bg-primary/5 border border-primary/20 transition-all font-semibold text-primary">
+          <span class="material-symbols-outlined text-[20px] text-secondary animate-pulse">menu_book</span>
+          <span class="flex-1">Ingesting Document & Semantic Grounding</span>
+          <span class="material-symbols-outlined text-[18px] text-secondary animate-spin">progress_activity</span>
+        </div>
+        <div id="step-plan-2" class="flex items-center gap-3 p-2.5 rounded-xl text-on-surface-variant transition-all opacity-60">
+          <span class="material-symbols-outlined text-[20px]">psychology</span>
+          <span class="flex-1">Fingerprinting Cognitive Prerequisites</span>
+          <span class="material-symbols-outlined text-[18px]">radio_button_unchecked</span>
+        </div>
+        <div id="step-plan-3" class="flex items-center gap-3 p-2.5 rounded-xl text-on-surface-variant transition-all opacity-60">
+          <span class="material-symbols-outlined text-[20px]">timeline</span>
+          <span class="flex-1">Generating Socratic Milestones</span>
+          <span class="material-symbols-outlined text-[18px]">radio_button_unchecked</span>
+        </div>
+        <div id="step-plan-4" class="flex items-center gap-3 p-2.5 rounded-xl text-on-surface-variant transition-all opacity-60">
+          <span class="material-symbols-outlined text-[20px]">view_in_ar</span>
+          <span class="flex-1">Synthesizing Interactive 3D STEM Lab</span>
+          <span class="material-symbols-outlined text-[18px]">radio_button_unchecked</span>
+        </div>
+      </div>
+
+      <div class="pt-1 text-center">
+        <span class="text-[11px] font-mono text-outline">Accelerated with Bharat LPU Inference & Dual Knowledge Graph</span>
+      </div>
+
+    </div>
   </div>
 
   <!-- SOURCE PASSAGE MODAL (CITATION INSPECTOR) -->
