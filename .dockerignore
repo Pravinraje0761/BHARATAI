@@ -1,0 +1,17 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+output/
+*.mp4
+*.wav
+*.mp3
+*.sqlite3
+*.zip
+.env
+.DS_Store
+frontend_stitch/screen.png
+ai-teacher-refinement-checklist.md
+.agents/

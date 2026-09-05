@@ -9,16 +9,17 @@ from __future__ import annotations
 from pathlib import Path
 
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 
 import config
 
 STATES = ("closed", "half", "open")
 _SIZE = (360, 360)
+_SIZE_HQ = (480, 480)
 
 
 # --------------------------------------------------------------------------- #
-# Persona images
+# Persona images — Express (flat, fast) vs Realistic Studio (shaded, softer)
 # --------------------------------------------------------------------------- #
 def _draw_face(mouth: str) -> Image.Image:
     img = Image.new("RGBA", _SIZE, (0, 0, 0, 0))
@@ -55,21 +56,104 @@ def _draw_face(mouth: str) -> Image.Image:
     return img
 
 
-def ensure_persona(directory: Path | None = None) -> dict[str, Path]:
+def _radial_shade(size: int, center_color: tuple, edge_color: tuple) -> Image.Image:
+    """Cheap radial gradient disc (numpy), used for shaded skin instead of a flat fill."""
+    yy, xx = np.mgrid[0:size, 0:size]
+    cx = cy = size / 2
+    dist = np.sqrt((xx - cx) ** 2 + (yy - cy) ** 2) / (size / 2)
+    dist = np.clip(dist, 0, 1)[..., None]
+    c0 = np.array(center_color, dtype=np.float32)
+    c1 = np.array(edge_color, dtype=np.float32)
+    rgb = (c0 * (1 - dist) + c1 * dist).astype(np.uint8)
+    return Image.fromarray(rgb, mode="RGB").convert("RGBA")
+
+
+def _draw_face_hq(mouth: str) -> Image.Image:
+    """Realistic Studio persona: gradient-shaded skin, soft blush/highlights,
+    drop shadow, larger canvas — same amplitude-driven mouth-swap technique,
+    but a noticeably more polished render for the paid tier."""
+    size = _SIZE_HQ[0]
+    img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    cx, cy = size // 2, size // 2
+
+    # soft drop shadow beneath the head
+    shadow = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+    sd = ImageDraw.Draw(shadow)
+    sd.ellipse([cx - 150, cy - 130, cx + 150, cy + 210], fill=(0, 0, 0, 90))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(18))
+    img = Image.alpha_composite(img, shadow)
+
+    # head: radial-shaded skin instead of a flat fill
+    head_mask = Image.new("L", (size, size), 0)
+    ImageDraw.Draw(head_mask).ellipse([cx - 172, cy - 198, cx + 172, cy + 210], fill=255)
+    skin = _radial_shade(size, (255, 232, 205), (222, 180, 145))
+    skin.putalpha(head_mask)
+    img = Image.alpha_composite(img, skin)
+
+    d = ImageDraw.Draw(img)
+    d.ellipse([cx - 172, cy - 198, cx + 172, cy + 210], outline=(150, 110, 80, 200), width=3)
+
+    # hair with a subtle gradient sheen
+    hair_mask = Image.new("L", (size, size), 0)
+    ImageDraw.Draw(hair_mask).chord([cx - 178, cy - 232, cx + 178, cy - 50], 180, 360, fill=255)
+    hair = _radial_shade(size, (92, 64, 45), (48, 32, 22))
+    hair.putalpha(hair_mask)
+    img = Image.alpha_composite(img, hair)
+
+    d = ImageDraw.Draw(img)
+    # cheek blush
+    for ex in (cx - 92, cx + 92):
+        blush = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+        bd = ImageDraw.Draw(blush)
+        bd.ellipse([ex - 30, cy + 18, ex + 30, cy + 58], fill=(235, 130, 120, 70))
+        blush = blush.filter(ImageFilter.GaussianBlur(14))
+        img = Image.alpha_composite(img, blush)
+    d = ImageDraw.Draw(img)
+
+    # eyes with catchlight highlight
+    for ex in (cx - 64, cx + 64):
+        d.ellipse([ex - 24, cy - 54, ex + 24, cy - 10], fill=(255, 255, 255, 255),
+                  outline=(90, 90, 100, 255), width=2)
+        d.ellipse([ex - 10, cy - 44, ex + 10, cy - 24], fill=(52, 38, 26, 255))
+        d.ellipse([ex - 5, cy - 42, ex + 1, cy - 36], fill=(255, 255, 255, 230))
+    # brows (gentle curve via arcs)
+    d.arc([cx - 96, cy - 90, cx - 34, cy - 58], 200, 340, fill=(70, 48, 34, 255), width=6)
+    d.arc([cx + 34, cy - 90, cx + 96, cy - 58], 200, 340, fill=(70, 48, 34, 255), width=6)
+    # nose
+    d.line([cx, cy - 16, cx - 14, cy + 38], fill=(196, 152, 122, 255), width=4)
+    d.line([cx - 14, cy + 38, cx + 10, cy + 40], fill=(196, 152, 122, 255), width=4)
+
+    # mouth by state, softer palette
+    my = cy + 104
+    if mouth == "closed":
+        d.line([cx - 52, my, cx + 52, my], fill=(165, 78, 78, 255), width=7)
+    elif mouth == "half":
+        d.ellipse([cx - 52, my - 16, cx + 52, my + 22], fill=(140, 55, 55, 255))
+        d.ellipse([cx - 34, my + 2, cx + 34, my + 20], fill=(232, 168, 168, 255))
+    else:  # open
+        d.ellipse([cx - 58, my - 34, cx + 58, my + 44], fill=(128, 42, 42, 255))
+        d.ellipse([cx - 32, my + 8, cx + 32, my + 38], fill=(232, 168, 168, 255))
+    return img
+
+
+def ensure_persona(directory: Path | None = None, style: str = "express") -> dict[str, Path]:
     """Create the 3 mouth-state PNGs if missing. Returns {state: path}."""
     directory = Path(directory or config.AVATAR_DIR)
+    if style == "realistic":
+        directory = directory / "realistic"
     directory.mkdir(parents=True, exist_ok=True)
+    draw_fn = _draw_face_hq if style == "realistic" else _draw_face
     paths = {}
     for state in STATES:
         p = directory / f"mouth_{state}.png"
         if not p.exists():
-            _draw_face(state).save(p)
+            draw_fn(state).save(p)
         paths[state] = p
     return paths
 
 
-def load_persona(directory: Path | None = None) -> dict[str, Image.Image]:
-    paths = ensure_persona(directory)
+def load_persona(directory: Path | None = None, style: str = "express") -> dict[str, Image.Image]:
+    paths = ensure_persona(directory, style=style)
     return {s: Image.open(p).convert("RGBA") for s, p in paths.items()}
 
 

@@ -68,6 +68,44 @@ _INSTR_SYS = (
 def parse_instruction(text: str) -> LearnerInstruction:
     if not text or not text.strip():
         return LearnerInstruction().normalised()
+
+    # Fast-path: regex/keyword heuristic (<1ms) to eliminate redundant LLM latency
+    import re
+    txt_lower = text.lower()
+
+    level = "beginner"
+    if "advanced" in txt_lower or "expert" in txt_lower or "deep dive" in txt_lower:
+        level = "advanced"
+    elif "intermediate" in txt_lower or "moderate" in txt_lower:
+        level = "intermediate"
+
+    time_minutes = 20
+    time_match = re.search(r"(\d+)\s*(?:min|minute)", txt_lower)
+    if time_match:
+        time_minutes = int(time_match.group(1))
+
+    language = "English"
+    for lang in VALID_LANGS:
+        if lang.lower() in txt_lower:
+            language = lang
+            break
+
+    style = "clear real-world examples"
+    for preset_name, preset_info in config.TEACH_ME_PRESETS.items():
+        if preset_name.lower() in txt_lower or preset_info.get("label", "").lower() in txt_lower:
+            style = preset_info.get("style", style)
+            break
+
+    # If standard structured tokens present, return instantly
+    if any(k in txt_lower for k in ("beginner", "intermediate", "advanced", "minute", "min", "style:", "teach me in")):
+        return LearnerInstruction(
+            level=level,
+            time_minutes=time_minutes,
+            language=language,
+            style=style,
+            focus="",
+        ).normalised()
+
     prompt = (
         "Student request:\n"
         f'"""{text.strip()}"""\n\n'
@@ -78,14 +116,23 @@ def parse_instruction(text: str) -> LearnerInstruction:
         "  style         : short phrase describing the example/explanation style\n"
         "  focus         : what to concentrate on (chapter, subtopic, or \"\")\n"
     )
-    data = generate_json(prompt, tag="instruction", system=_INSTR_SYS)
-    return LearnerInstruction(
-        level=data.get("level", "beginner"),
-        time_minutes=data.get("time_minutes", 20),
-        language=data.get("language", "English"),
-        style=data.get("style", "clear real-world examples"),
-        focus=data.get("focus", ""),
-    ).normalised()
+    try:
+        data = generate_json(prompt, tag="instruction", system=_INSTR_SYS)
+        return LearnerInstruction(
+            level=data.get("level", level),
+            time_minutes=data.get("time_minutes", time_minutes),
+            language=data.get("language", language),
+            style=data.get("style", style),
+            focus=data.get("focus", ""),
+        ).normalised()
+    except Exception:
+        return LearnerInstruction(
+            level=level,
+            time_minutes=time_minutes,
+            language=language,
+            style=style,
+            focus="",
+        ).normalised()
 
 
 # --------------------------------------------------------------------------- #

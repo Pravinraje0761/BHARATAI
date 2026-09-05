@@ -6,6 +6,7 @@ bundled with ``imageio-ffmpeg`` is used, so no OS-level install is required.
 """
 from __future__ import annotations
 
+import math
 import shutil
 import subprocess
 import textwrap
@@ -73,23 +74,28 @@ def compose_segment_video(
     out_path: str | Path,
     subtitle: str = "",
     fps: int | None = None,
+    production_tier: str = "express",
 ) -> Path:
     import cv2
 
-    fps = fps or config.VIDEO_FPS
-    w, h = config.VIDEO_W, config.VIDEO_H
+    is_realistic = production_tier == "realistic"
+    fps = fps or (24 if is_realistic else config.VIDEO_FPS)
+    w, h = (1920, 1080) if is_realistic else (config.VIDEO_W, config.VIDEO_H)
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     audio_path = Path(audio_path)
 
     # 1. background slide
     slide_png = out_path.with_name(out_path.stem + "_slide.png")
-    render_slide(title, bullets_from_text(explanation_text), slide_png, subtitle=subtitle)
+    render_slide(
+        title, bullets_from_text(explanation_text), slide_png, subtitle=subtitle,
+        size=(w, h), production_tier=production_tier,
+    )
     slide = Image.open(slide_png).convert("RGB").resize((w, h))
 
     # 2. avatar frames + timing
-    persona = load_persona()
-    av_box = 300
+    persona = load_persona(style="realistic" if is_realistic else "express")
+    av_box = 420 if is_realistic else 300
     persona = {k: v.resize((av_box, av_box)) for k, v in persona.items()}
     est = max(2.0, 0.35 * len(explanation_text.split()))
     try:
@@ -111,48 +117,83 @@ def compose_segment_video(
 
     ax, ay = w - av_box - 40, h - av_box - 40
 
-    # Pre-render gold avatar border onto slide
-    slide.paste(
-        Image.new("RGB", (av_box + 12, av_box + 12), (240, 190, 70)),
-        (ax - 6, ay - 6),
-    )
+    if is_realistic:
+        # Soft circular frame (matches the round persona) instead of a flat
+        # square chip — sits inside the studio-light glow already painted
+        # into the slide background.
+        ring = Image.new("RGBA", (av_box + 40, av_box + 40), (0, 0, 0, 0))
+        rd = ImageDraw.Draw(ring)
+        rd.ellipse([0, 0, av_box + 40, av_box + 40], outline=(240, 190, 70, 230), width=6)
+        slide.paste(ring, (ax - 20, ay - 20), ring)
+    else:
+        # Pre-render gold avatar border onto slide
+        slide.paste(
+            Image.new("RGB", (av_box + 12, av_box + 12), (240, 190, 70)),
+            (ax - 6, ay - 6),
+        )
 
-    # Pre-render composite frames for each (mouth_state, caption_step)
-    # Eliminates hundreds of expensive PIL copies/composites/conversions into a fast pre-cache
-    n_cap = max(1, len(cap_lines))
-    cached_bgr = {}
-    for st, av_img in persona.items():
-        base_st = slide.copy()
-        base_st.paste(av_img, (ax, ay), av_img)
-        if cap_lines:
-            for shown in range(1, n_cap + 1):
-                f = base_st.copy()
-                _draw_caption(f, " ".join(cap_lines[:shown]))
-                cached_bgr[(st, shown)] = cv2.cvtColor(np.array(f), cv2.COLOR_RGB2BGR)
-        else:
-            cached_bgr[(st, 1)] = cv2.cvtColor(np.array(base_st), cv2.COLOR_RGB2BGR)
+    if is_realistic:
+        # Realistic Studio renders every frame individually (no cache reuse)
+        # so the avatar can carry a subtle idle sway/breathing motion instead
+        # of a flat mouth-state swap — costs more render time, which is the
+        # point of the paid tier: a visibly more alive, higher-fidelity clip.
+        for i in range(n_frames):
+            state = states[min(i, len(states) - 1)] if states else "closed"
+            shown = max(1, round((i + 1) / n_frames * len(cap_lines))) if cap_lines else 1
+            frame = slide.copy()
+            sway = int(3 * math.sin(i / fps * 1.4))
+            frame.paste(persona[state], (ax, ay + sway), persona[state])
+            if cap_lines:
+                _draw_caption(frame, " ".join(cap_lines[:shown]))
+            vw.write(cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR))
+    else:
+        # Express path: pre-render composite frames for each (mouth_state,
+        # caption_step) once, then just look them up — fast, no per-frame
+        # PIL cost, since express is optimized for a ~3s turnaround.
+        n_cap = max(1, len(cap_lines))
+        cached_bgr = {}
+        for st, av_img in persona.items():
+            base_st = slide.copy()
+            base_st.paste(av_img, (ax, ay), av_img)
+            if cap_lines:
+                for shown in range(1, n_cap + 1):
+                    f = base_st.copy()
+                    _draw_caption(f, " ".join(cap_lines[:shown]))
+                    cached_bgr[(st, shown)] = cv2.cvtColor(np.array(f), cv2.COLOR_RGB2BGR)
+            else:
+                cached_bgr[(st, 1)] = cv2.cvtColor(np.array(base_st), cv2.COLOR_RGB2BGR)
 
-    default_bgr = list(cached_bgr.values())[0]
+        default_bgr = list(cached_bgr.values())[0]
 
-    for i in range(n_frames):
-        state = states[min(i, len(states) - 1)] if states else "closed"
-        shown = max(1, round((i + 1) / n_frames * len(cap_lines))) if cap_lines else 1
-        vw.write(cached_bgr.get((state, shown), default_bgr))
+        for i in range(n_frames):
+            state = states[min(i, len(states) - 1)] if states else "closed"
+            shown = max(1, round((i + 1) / n_frames * len(cap_lines))) if cap_lines else 1
+            vw.write(cached_bgr.get((state, shown), default_bgr))
 
     vw.release()
 
-    # 3. mux audio with ultrafast preset to a temporary target, then atomic rename
+    # 3. mux audio — Express uses the fastest possible encode; Realistic
+    # Studio trades render time for a visibly sharper, smoother result.
     ff = _ffmpeg_exe()
     tmp_out = out_path.with_name(out_path.stem + "_rendering.mp4")
     tmp_out.unlink(missing_ok=True)
 
-    cmd = [
-        ff, "-y", "-i", str(silent_mp4), "-i", str(audio_path),
-        "-c:v", "libx264", "-preset", "ultrafast", "-tune", "stillimage", "-crf", "26",
-        "-pix_fmt", "yuv420p", "-c:a", "aac",
-        "-movflags", "+faststart",
-        "-shortest", str(tmp_out),
-    ]
+    if is_realistic:
+        cmd = [
+            ff, "-y", "-i", str(silent_mp4), "-i", str(audio_path),
+            "-c:v", "libx264", "-preset", "medium", "-crf", "18",
+            "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k",
+            "-movflags", "+faststart",
+            "-shortest", str(tmp_out),
+        ]
+    else:
+        cmd = [
+            ff, "-y", "-i", str(silent_mp4), "-i", str(audio_path),
+            "-c:v", "libx264", "-preset", "ultrafast", "-tune", "stillimage", "-crf", "26",
+            "-pix_fmt", "yuv420p", "-c:a", "aac",
+            "-movflags", "+faststart",
+            "-shortest", str(tmp_out),
+        ]
     proc = subprocess.run(cmd, capture_output=True, text=True)
     if proc.returncode != 0 or not tmp_out.exists():
         # keep the silent version as a usable fallback

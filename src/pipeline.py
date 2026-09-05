@@ -70,6 +70,7 @@ def render_segment_media(
     explanation_text: str,
     language: str,
     workdir: Path | None = None,
+    production_tier: str = "express",
 ) -> dict:
     workdir = Path(workdir or config.WORKDIR / "media")
     workdir.mkdir(parents=True, exist_ok=True)
@@ -84,6 +85,7 @@ def render_segment_media(
         audio_path=audio,
         out_path=workdir / f"seg{seg_index}_{language}.mp4",
         subtitle=f"{seg_index + 1}. {seg.concept}",
+        production_tier=production_tier,
     )
     return {"audio": str(audio), "video": str(video), "concept": seg.concept}
 

@@ -32,10 +32,27 @@ class Chunk:
 def _extract_pdf(path: Path):
     from pypdf import PdfReader
 
-    reader = PdfReader(str(path))
     out = []
-    for i, page in enumerate(reader.pages, start=1):
-        out.append((i, f"p.{i}", page.extract_text() or ""))
+    try:
+        reader = PdfReader(str(path))
+        for i, page in enumerate(reader.pages, start=1):
+            try:
+                raw = page.extract_text() or ""
+            except Exception as pe:
+                print(f"[PDF WARN] Failed to extract page {i} of {path.name}: {pe}")
+                raw = ""
+            raw = raw.replace("\x00", "").strip()
+            out.append((i, f"p.{i}", raw))
+    except Exception as e:
+        print(f"[PDF ERROR] Failed reading {path.name}: {e}")
+        try:
+            import pypdfium2 as pdfium
+            pdf = pdfium.PdfDocument(str(path))
+            for i, page in enumerate(pdf, start=1):
+                raw = page.get_textpage().get_text_range() or ""
+                out.append((i, f"p.{i}", raw.replace("\x00", "").strip()))
+        except Exception:
+            pass
     return out
 
 
@@ -182,3 +199,72 @@ def ingest_many(paths) -> list[Chunk]:
     for i, c in enumerate(out):
         c.index = i
     return out
+
+
+def extract_doc_metadata(path: str | Path) -> dict[str, Any]:
+    """Inspect and extract document metadata immediately upon upload.
+    Returns:
+        filename, page_count, word_count, chunk_count, suggested_topic, preview_snippet, is_valid, error
+    """
+    p = Path(path)
+    ext = p.suffix.lower()
+    if ext not in _EXTRACTORS:
+        return {
+            "filename": p.name,
+            "is_valid": False,
+            "error": f"Unsupported format '{ext}'. Supported: {', '.join(SUPPORTED_EXTS)}",
+            "page_count": 0,
+            "word_count": 0,
+            "chunk_count": 0,
+            "suggested_topic": "",
+            "preview_snippet": "",
+        }
+
+    try:
+        units = _EXTRACTORS[ext](p)
+        total_pages = len(units)
+        combined_text = " ".join(u[2] for u in units).strip()
+        words = combined_text.split()
+        word_count = len(words)
+
+        chunks = ingest(p)
+        chunk_count = len(chunks)
+
+        # Inferred topic heuristics
+        suggested_topic = ""
+        if units and units[0][2]:
+            first_lines = [line.strip() for line in units[0][2].splitlines() if len(line.strip()) > 3]
+            for line in first_lines[:5]:
+                clean_line = re.sub(r"^[\#\/\*\=\-\s]+", "", line).strip()
+                if 5 < len(clean_line) < 70 and not re.search(r"page\s+\d|copyright|all rights reserved|isbn", clean_line, re.I):
+                    suggested_topic = clean_line
+                    break
+
+        if not suggested_topic:
+            raw_stem = p.stem.replace("_", " ").replace("-", " ")
+            raw_stem = re.sub(r"^[0-9a-f]{8}\s*", "", raw_stem)
+            suggested_topic = raw_stem.title()
+
+        preview = combined_text[:200] + "..." if len(combined_text) > 200 else combined_text
+
+        return {
+            "filename": p.name,
+            "is_valid": True,
+            "page_count": total_pages,
+            "word_count": word_count,
+            "chunk_count": chunk_count,
+            "suggested_topic": suggested_topic,
+            "preview_snippet": preview,
+            "error": None,
+        }
+    except Exception as exc:
+        return {
+            "filename": p.name,
+            "is_valid": False,
+            "error": str(exc),
+            "page_count": 0,
+            "word_count": 0,
+            "chunk_count": 0,
+            "suggested_topic": p.stem.replace("_", " ").title(),
+            "preview_snippet": "",
+        }

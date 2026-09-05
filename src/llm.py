@@ -20,8 +20,11 @@ import config
 _MODELS: dict[str, Any] = {}
 
 CANDIDATE_MODELS = [
-    config.GEMINI_MODEL,
+    "gemini-flash-latest",
+    "gemini-3.6-flash",
+    "gemini-3-flash-preview",
     "gemini-2.5-flash",
+    config.GEMINI_MODEL,
 ]
 
 
@@ -78,11 +81,14 @@ def _call_groq(
     if not config.GROQ_API_KEY:
         raise RuntimeError("No GROQ_API_KEY configured")
 
-    models_to_try = [
+    # Groq's free-tier model lineup rotates; keep the configured model first,
+    # then known-current fallbacks (deduplicated, order preserved).
+    models_to_try = list(dict.fromkeys([
         config.GROQ_MODEL or "qwen/qwen3.8-27b",
-        "groq/compound-mini",
+        "qwen/qwen3.8-27b",
         "openai/gpt-oss-20b",
-    ]
+        "groq/compound-mini",
+    ]))
 
     headers = {
         "Authorization": f"Bearer {config.GROQ_API_KEY.strip()}",
@@ -104,14 +110,14 @@ def _call_groq(
                 "max_tokens": 1024,
                 "temperature": max(0.1, min(temperature, 1.0)),
             }
-            if expect_json and "qwen" in model_name.lower():
+            if expect_json and any(x in model_name.lower() for x in ("qwen", "llama", "gpt-oss")):
                 payload["response_format"] = {"type": "json_object"}
 
             resp = requests.post(
                 f"{config.GROQ_BASE_URL.rstrip('/')}/chat/completions",
                 headers=headers,
                 json=payload,
-                timeout=4.0,
+                timeout=12.0,
             )
             if resp.status_code == 200:
                 data = resp.json()
@@ -119,7 +125,9 @@ def _call_groq(
                 if expect_json:
                     return json.loads(_extract_json(content))
                 return content
-        except Exception:
+            print(f"[llm.py] Groq {model_name} returned HTTP {resp.status_code}: {resp.text[:200]}")
+        except Exception as exc:
+            print(f"[llm.py] Groq {model_name} failed: {exc!r}")
             continue
 
     raise RuntimeError("All Groq model endpoints failed or timed out.")
@@ -161,7 +169,7 @@ def _call_nvidia_nim(
                 f"{config.NVIDIA_BASE_URL.rstrip('/')}/chat/completions",
                 headers=headers,
                 json=payload,
-                timeout=6.0,
+                timeout=15.0,
             )
             if resp.status_code == 200:
                 data = resp.json()
@@ -169,7 +177,9 @@ def _call_nvidia_nim(
                 if expect_json:
                     return json.loads(_extract_json(content))
                 return content
-        except Exception:
+            print(f"[llm.py] NVIDIA NIM {model_name} returned HTTP {resp.status_code}: {resp.text[:200]}")
+        except Exception as exc:
+            print(f"[llm.py] NVIDIA NIM {model_name} failed: {exc!r}")
             continue
 
     raise RuntimeError("All NVIDIA NIM model endpoints failed or timed out.")
@@ -194,7 +204,10 @@ def _live_text_with_fallback(prompt: str, system: str | None, temperature: float
     full = f"{system.strip()}\n\n{prompt}" if system else prompt
     errors = []
 
-    models_to_try = [config.GEMINI_MODEL] + [m for m in CANDIDATE_MODELS if m != config.GEMINI_MODEL]
+    # Try the curated, actively-maintained model aliases first; a stale
+    # user-configured GEMINI_MODEL (e.g. a since-deprecated dated snapshot)
+    # only gets tried last instead of wasting the first attempt on it.
+    models_to_try = list(dict.fromkeys(CANDIDATE_MODELS))
 
     for model_name in models_to_try:
         try:
@@ -203,7 +216,7 @@ def _live_text_with_fallback(prompt: str, system: str | None, temperature: float
                 model.generate_content,
                 full,
                 generation_config={"temperature": temperature},
-                timeout=3.0,
+                timeout=6.0,
             )
             if resp and resp.text:
                 return resp.text.strip()
@@ -233,7 +246,10 @@ def _live_json_with_fallback(prompt: str, system: str | None, temperature: float
     full = f"{system.strip()}\n\n{prompt}" if system else prompt
     errors = []
 
-    models_to_try = [config.GEMINI_MODEL] + [m for m in CANDIDATE_MODELS if m != config.GEMINI_MODEL]
+    # Try the curated, actively-maintained model aliases first; a stale
+    # user-configured GEMINI_MODEL (e.g. a since-deprecated dated snapshot)
+    # only gets tried last instead of wasting the first attempt on it.
+    models_to_try = list(dict.fromkeys(CANDIDATE_MODELS))
 
     for model_name in models_to_try:
         try:
@@ -246,14 +262,14 @@ def _live_json_with_fallback(prompt: str, system: str | None, temperature: float
                         "temperature": temperature,
                         "response_mime_type": "application/json",
                     },
-                    timeout=2.0,
+                    timeout=6.5,
                 )
             except Exception:
                 resp = _call_with_timeout(
                     model.generate_content,
                     full + "\n\nReturn ONLY valid JSON, no prose, no code fence.",
                     generation_config={"temperature": temperature},
-                    timeout=2.0,
+                    timeout=6.5,
                 )
             if resp and resp.text:
                 return json.loads(_extract_json(resp.text))
@@ -574,5 +590,11 @@ def _mock_json(tag: str, prompt: str) -> Any:
             "next_topic": "Series and parallel resistor networks",
             "reason": "Builds directly on the Ohm's-law relationship that was weak last session.",
         }
+
+    if tag == "3d_model":
+        from src.model_3d import _synthesize_procedural_scene
+        m = re.search(r"'(.*?)'", prompt)
+        concept = m.group(1) if m else "Scientific Structure"
+        return _synthesize_procedural_scene(concept)
 
     return {"mock": True, "tag": tag}
