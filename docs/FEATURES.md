@@ -10,14 +10,14 @@
 2. [Document Ingestion & Multi-Format Parsing](#2-document-ingestion--multi-format-parsing)
 3. [Hybrid RAG Retrieval Engine](#3-hybrid-rag-retrieval-engine)
 4. [Multi-Tiered Cascading LLM Architecture](#4-multi-tiered-cascading-llm-architecture)
-5. [Bharat Context Engine™ (Cultural Metaphors)](#5-bharat-context-engine-cultural-metaphors)
+5. [Bharat Context Engine (Cultural Metaphors)](#5-bharat-context-engine-cultural-metaphors)
 6. [Hallucination Shield & Citation Grounding Verifier](#6-hallucination-shield--citation-grounding-verifier)
 7. [Adaptive Pedagogical State Machine & Teaching Loop](#7-adaptive-pedagogical-state-machine--teaching-loop)
-8. [Misconception Engine™ & Cognitive Fingerprinting](#8-misconception-engine--cognitive-fingerprinting)
+8. [Misconception Engine & Cognitive Fingerprinting](#8-misconception-engine--cognitive-fingerprinting)
 9. [Adaptive Pedagogy Policy Selector & Socratic Dialogue](#9-adaptive-pedagogy-policy-selector--socratic-dialogue)
 10. [12 Indian Languages Multilingual Neural TTS](#10-12-indian-languages-multilingual-neural-tts)
 11. [Pure-CPU Lip-Synced Avatar & Ultrafast Video Compositing](#11-pure-cpu-lip-synced-avatar--ultrafast-video-compositing)
-12. [Bharat 3D Lab™ — Universal WebGL Science Visualizer](#12-bharat-3d-lab--universal-webgl-science-visualizer)
+12. [Bharat 3D Lab — Universal WebGL Science Visualizer](#12-bharat-3d-lab--universal-webgl-science-visualizer)
 13. [Student Knowledge Graph & Dependency Modeler](#13-student-knowledge-graph--dependency-modeler)
 14. [Learning DNA Profiler (5D Cognitive Spectrum)](#14-learning-dna-profiler-5d-cognitive-spectrum)
 15. [Ebbinghaus Spaced Repetition Retention Engine (SM-2)](#15-ebbinghaus-spaced-repetition-retention-engine-sm-2)
@@ -130,7 +130,7 @@ Upload (PDF/DOCX/PPTX/TXT) or Topic
 
 ---
 
-## 5. Bharat Context Engine™ (Cultural Metaphors)
+## 5. Bharat Context Engine (Cultural Metaphors)
 *Source: `src/bharat_context.py`*
 
 - **Localized Indian Real-World Anchors**:
@@ -176,7 +176,7 @@ Upload (PDF/DOCX/PPTX/TXT) or Topic
 
 ---
 
-## 8. Misconception Engine™ & Cognitive Fingerprinting
+## 8. Misconception Engine & Cognitive Fingerprinting
 *Source: `src/misconception_engine.py`*
 
 - **Empirical Flaw Taxonomy**:
@@ -255,7 +255,7 @@ Upload (PDF/DOCX/PPTX/TXT) or Topic
 
 ---
 
-## 12. Bharat 3D Lab™ — Universal WebGL Science Visualizer
+## 12. Bharat 3D Lab — Universal WebGL Science Visualizer
 *Source: `src/model_3d.py`, `static/three_lab.js`*
 
 - **Interactive 3D WebGL Simulation Canvas**:

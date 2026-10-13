@@ -2092,7 +2092,7 @@ function renderReportCard(data) {
 }
 
 // --------------------------------------------------------------------------- //
-// BHARAT 3D LAB™ EVENT CONTROLLER
+// BHARAT 3D LAB EVENT CONTROLLER
 // --------------------------------------------------------------------------- //
 function bind3DLabEvents() {
   // Preset model switcher (DNA, Atom, Motor, Solar)

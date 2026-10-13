@@ -1,5 +1,7 @@
 # 🎓 BHARATGURU — Adaptive Multilingual AI Learning System
 
+[![CI](https://github.com/Pravinraje0761/BHARATAI/actions/workflows/ci.yml/badge.svg)](https://github.com/Pravinraje0761/BHARATAI/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/backend-FastAPI-009688.svg)](https://fastapi.tiangolo.com/)
 [![Three.js](https://img.shields.io/badge/3D%20Engine-Three.js%20WebGL-black.svg)](https://threejs.org/)
@@ -8,7 +10,7 @@
 [![Indic Languages](https://img.shields.io/badge/Languages-12%20Indian%20Languages-green.svg)](#10-12-indian-languages--multilingual-neural-voice)
 [![CPU Video](https://img.shields.io/badge/Avatar-Zero%20GPU%20Lip--Sync-purple.svg)](#11-pure-cpu-amplitude-driven-avatar--video-compositing)
 
-> **BHARATGURU (AI Teacher)** is an enterprise-grade, autonomous pedagogical AI learning platform engineered specifically for Indian learners. It takes uploaded curriculum documents (PDF, DOCX, PPTX, TXT, MD) or a raw syllabus topic, builds a structured adaptive lesson plan, and teaches it segment-by-segment using an amplitude-driven lip-synced avatar and neural voice.
+> **BHARATGURU (AI Teacher)** is an adaptive, multilingual AI tutoring platform built for Indian learners. It takes uploaded curriculum documents (PDF, DOCX, PPTX, TXT, MD) or a raw syllabus topic, builds a structured adaptive lesson plan, and teaches it segment-by-segment using an amplitude-driven lip-synced avatar and neural voice.
 >
 > As the student learns, BHARATGURU questions them, **fingerprints cognitive misconceptions**, dynamically shifts teaching strategies, anchors explanations in familiar **Indian cultural metaphors**, checks citations with a **Hallucination Shield**, visualizes complex STEM concepts in an **interactive Three.js 3D Lab**, tracks cognitive mastery on a **Student Knowledge Graph**, computes an empirical **Learning DNA profile**, schedules reviews via **Ebbinghaus Spaced Repetition**, and equips educators with an **Institutional Teacher Dashboard**.
 
@@ -25,15 +27,15 @@
    - [1. Multi-Format Document Ingestion & Chunking](#1-multi-format-document-ingestion--chunking)
    - [2. Hybrid RAG Engine (Dense Semantic + Sparse BM25 + RRF)](#2-hybrid-rag-engine-dense-semantic--sparse-bm25--rrf)
    - [3. Multi-Tiered Cascading LLM Engine & Offline Mock](#3-multi-tiered-cascading-llm-engine--offline-mock)
-   - [4. Bharat Context Engine™ (Indian Cultural & Real-World Anchors)](#4-bharat-context-engine-indian-cultural--real-world-anchors)
+   - [4. Bharat Context Engine (Indian Cultural & Real-World Anchors)](#4-bharat-context-engine-indian-cultural--real-world-anchors)
    - [5. Hallucination Shield & Citation Grounding Verifier](#5-hallucination-shield--citation-grounding-verifier)
-   - [6. Misconception Engine™ & Cognitive Fingerprinter](#6-misconception-engine--cognitive-fingerprinter)
+   - [6. Misconception Engine & Cognitive Fingerprinter](#6-misconception-engine--cognitive-fingerprinter)
    - [7. Adaptive Pedagogy Policy Selector](#7-adaptive-pedagogy-policy-selector)
    - [8. Socratic Dialogue Engine](#8-socratic-dialogue-engine)
    - [9. Pedagogical State Machine Loop & Dynamic Difficulty](#9-pedagogical-state-machine-loop--dynamic-difficulty)
    - [10. 12 Indian Languages & Multilingual Neural Voice](#10-12-indian-languages--multilingual-neural-voice)
    - [11. Pure-CPU Amplitude-Driven Avatar & Video Compositing](#11-pure-cpu-amplitude-driven-avatar--video-compositing)
-   - [12. Bharat 3D Lab™ — Universal WebGL Science Visualizer](#12-bharat-3d-lab--universal-webgl-science-visualizer)
+   - [12. Bharat 3D Lab — Universal WebGL Science Visualizer](#12-bharat-3d-lab--universal-webgl-science-visualizer)
    - [13. Student Knowledge Graph & Prerequisite Dependency Engine](#13-student-knowledge-graph--prerequisite-dependency-engine)
    - [14. Learning DNA Profiler (5-Dimensional Cognitive Spectrum)](#14-learning-dna-profiler-5-dimensional-cognitive-spectrum)
    - [15. Cognitive Spaced Repetition Retention Engine (SM-2)](#15-cognitive-spaced-repetition-retention-engine-sm-2)
@@ -109,11 +111,11 @@ Traditional ed-tech delivers static videos or generic chatbots that regurgitate 
 - **Robust JSON Extraction**: `_extract_json()` strips markdown fences, extracts nested objects/arrays, and enforces schema compliance.
 - **Deterministic Offline Pedagogical Engine (`LLM_MOCK=1`)**:
   - Full-featured offline fallback covering instruction parsing, curriculum planning, spoken explanations, few-shot grading, misconception fingerprinting, quiz creation, and report generation.
-  - Guarantees 0% pipeline crashes even with zero internet or no API keys configured.
+  - Lets the full pipeline run with no internet connection or API keys (useful for demos and tests).
 
 ---
 
-### 4. Bharat Context Engine™ (Indian Cultural & Real-World Anchors)
+### 4. Bharat Context Engine (Indian Cultural & Real-World Anchors)
 *Implementation: `src/bharat_context.py`*
 - **Cultural Pedagogy Directives**: Automatically converts abstract Western STEM concepts into relatable Indian physical anchors:
   - Baseball / Football $\rightarrow$ 140 km/h Jasprit Bumrah leather cricket ball, Rohit Sharma cover drive, Kabaddi.
@@ -144,7 +146,7 @@ Traditional ed-tech delivers static videos or generic chatbots that regurgitate 
 
 ---
 
-### 6. Misconception Engine™ & Cognitive Fingerprinter
+### 6. Misconception Engine & Cognitive Fingerprinter
 *Implementation: `src/misconception_engine.py`*
 - **Cognitive Diagnosis Beyond Right/Wrong**: Analyzes student errors to isolate flawed mental models, incomplete analogies, or false intuitions.
 - **Curated High-Frequency STEM Misconception Knowledgebase**:
@@ -241,7 +243,7 @@ Traditional ed-tech delivers static videos or generic chatbots that regurgitate 
 
 ---
 
-### 12. Bharat 3D Lab™ — Universal WebGL Science Visualizer
+### 12. Bharat 3D Lab — Universal WebGL Science Visualizer
 *Implementation: `src/model_3d.py`, `static/three_lab.js`*
 - **Interactive Three.js 3D WebGL Engine**:
   - OrbitControls: Drag to rotate, scroll to zoom, right-click to pan.
@@ -348,7 +350,7 @@ Traditional ed-tech delivers static videos or generic chatbots that regurgitate 
   1. *Upload & Plan View*: File dropzone, topic input, duration selector, and "Teach Me Like..." preset bar.
   2. *Lesson Plan Preview View*: Concept segments, source citation badges, and checkpoint previews.
   3. *Live Interactive Classroom View*: Synchronized video/audio player, Hallucination Shield badge, spoken transcript, checkpoint question card, answer submission, and Misconception Engine diagnosis card.
-  4. *Bharat 3D Lab™ View*: Three.js WebGL canvas, 8 model presets, prompt generator, and annotation inspector.
+  4. *Bharat 3D Lab View*: Three.js WebGL canvas, 8 model presets, prompt generator, and annotation inspector.
   5. *Knowledge Graph View*: Interactive physics network canvas, KPI mastery cards, and concept diagnostic drawer.
   6. *Learning DNA View*: 5-dimensional progress bars and personalized cognitive insight card.
   7. *Spaced Repetition View*: Prioritized SM-2 review cards and flash question triggers.
@@ -423,7 +425,7 @@ Traditional ed-tech delivers static videos or generic chatbots that regurgitate 
 │         │                                      │                   │         │
 │         ▼                                      ▼                   ▼         │
 │  Bharat Context       Few-Shot Formative Grader       Pedagogy Selector      │
-│  Hallucination Shield Misconception Engine™           (Analogy, Counter-     │
+│  Hallucination Shield Misconception Engine           (Analogy, Counter-     │
 │  (Citation Guard)     (Cognitive Diagnosis)            example, Socratic)    │
 └─────────┬──────────────────────────────────────────────────────────┬─────────┘
           │                                                          │
@@ -434,7 +436,7 @@ Traditional ed-tech delivers static videos or generic chatbots that regurgitate 
 │ • CPU Amplitude Lip-Sync     │                         │ • Learning DNA        │
 │ • Subject-Tinted Slides      │                         │ • Spaced Repetition   │
 │ • Burned-in Subtitles MP4    │                         │ • Teacher Dashboard   │
-│ • Bharat 3D Lab™ (Three.js)  │                         │ • Next-Topic Engine   │
+│ • Bharat 3D Lab (Three.js)  │                         │ • Next-Topic Engine   │
 └──────────────────────────────┘                         └───────────────────────┘
 ```
 
@@ -450,7 +452,8 @@ BHARAT_AI/
 ├── requirements.txt               # Complete Python project dependencies
 ├── .env.example                   # Template environment variables file
 ├── README.md                      # Comprehensive project documentation
-├── DOCUMENTATION.md               # Technical documentation & sprint architecture notes
+├── docs/                          # Feature reference, technical notes, refinement checklist
+├── tests/                         # pytest unit tests (run in CI)
 │
 ├── src/                           # Core Engine Modules
 │   ├── __init__.py                # Package initializer
@@ -464,7 +467,7 @@ BHARAT_AI/
 │   ├── learning_dna.py            # Learning DNA 5-dimensional cognitive profiler
 │   ├── lesson_planner.py          # Free-text instruction parser & curriculum planning agent
 │   ├── llm.py                     # Multi-tier cascading LLM wrapper (Groq + NVIDIA + Gemini + Mock)
-│   ├── misconception_engine.py    # Misconception Engine™ & cognitive error fingerprinter
+│   ├── misconception_engine.py    # Misconception Engine & cognitive error fingerprinter
 │   ├── model_3d.py                # Bharat 3D Lab procedural Three.js science model generator
 │   ├── pedagogy.py                # Adaptive pedagogy policy selector & Socratic dialogue engine
 │   ├── pipeline.py                # End-to-end pipeline orchestrator & headless runner
@@ -589,7 +592,21 @@ streamlit run app.py
 
 ## 🧪 Verification & Offline Testing
 
-You can verify all components locally without spending tokens using `LLM_MOCK=1`:
+### Unit tests (run in CI)
+
+```bash
+pip install -r requirements.txt pytest
+pytest
+```
+
+`tests/` covers authentication (including a fresh-database regression test), BM25 ranking,
+the grounding check and the knowledge graph. Each test uses its own temporary database and
+needs no API keys, models or network access.
+
+### End-to-end scripts
+
+The scripts in `scripts/` exercise whole flows and need the full dependencies (including the
+MiniLM model download). You can verify all components locally without spending tokens using `LLM_MOCK=1`:
 
 ```bash
 # On Windows PowerShell:
@@ -640,12 +657,12 @@ All settings are configured via `config.py` and `.env`:
 | Feature | Standard AI Chatbots | BHARATGURU (AI Teacher) |
 |:---|:---|:---|
 | **Teaching Model** | Passive walls of text | Active segment-by-segment check-and-teach cycle |
-| **Error Handling** | Simple "Incorrect, here is the answer" | **Misconception Engine™**: Identifies cognitive root cause & prescribes counterexamples |
+| **Error Handling** | Simple "Incorrect, here is the answer" | **Misconception Engine**: Identifies cognitive root cause & prescribes counterexamples |
 | **Pedagogical Shifts** | Repeats the same explanation | **Adaptive Policy Selector**: Switches to worked examples, analogies, or Socratic inquiry |
 | **Cultural Relevance** | Generic Western examples ($ and baseball) | **Bharat Context Engine**: Authentic Indian metaphors, cricket mechanics, and regional anchors |
 | **Hallucination Protection** | Unchecked generative output | **Hallucination Shield**: Real-time document lexical overlap scoring & passage inspector |
 | **Visuals & Avatars** | None or heavy multi-gigabyte GPU models | **Pure-CPU Lip-Sync Avatar**: Real-time RMS volume envelope mouth swapping (Zero GPU) |
-| **3D Interactivity** | None | **Bharat 3D Lab™**: Interactive Three.js WebGL models & dynamic generative 3D constructor |
+| **3D Interactivity** | None | **Bharat 3D Lab**: Interactive Three.js WebGL models & dynamic generative 3D constructor |
 | **Long-Term Memory** | Session resets on refresh | **Knowledge Graph & Learning DNA**: Ebbinghaus decay curve, mastery tracking & SM-2 review queue |
 | **Institutional Use** | None | **Teacher Dashboard**: Cohort mastery heatmap, shared misconception clusters & 1-click remediations |
 

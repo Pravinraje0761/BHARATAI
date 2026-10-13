@@ -13,6 +13,6 @@ output/
 .env
 .DS_Store
 frontend_stitch/screen.png
-ai-teacher-refinement-checklist.md
+docs/
 .claude/
 .agents/

@@ -1,4 +1,4 @@
-"""Misconception Engine™ for BHARATGURU.
+"""Misconception Engine for BHARATGURU.
 
 Identifies cognitive roots of student errors, computes diagnosis confidence,
 and prescribes targeted pedagogical interventions and counterexamples.
@@ -66,7 +66,7 @@ class MisconceptionFingerprint:
 
 
 _FINGERPRINT_SYS = (
-    "You are the Misconception Engine™ in an advanced pedagogical AI tutor. "
+    "You are the Misconception Engine in an advanced pedagogical AI tutor. "
     "Given a concept, question, and student's incorrect answer, diagnose the deep "
     "cognitive reason why they are wrong. Output ONLY JSON with keys: "
     "misconception (str), confidence (0.5 to 0.99), likely_cause (str), "

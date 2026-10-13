@@ -2,7 +2,7 @@
 
 Tests all 19 innovative architectural pillars:
 1. Student Knowledge Graph & Dependency Modeler
-2. Misconception Engine™ & Cognitive Fingerprinter
+2. Misconception Engine & Cognitive Fingerprinter
 3. Adaptive Pedagogy Policy Selector & Socratic Inquiry
 4. Bharat Context Engine
 5. Hybrid RAG (Dense + BM25) & Hallucination Shield
@@ -70,7 +70,7 @@ def test_knowledge_graph():
 
 
 def test_misconception_engine():
-    print("\n== [2] Testing Misconception Engine™ ==")
+    print("\n== [2] Testing Misconception Engine ==")
     # Test case 1: Current consumed by components
     fp1 = fingerprint_misconception(
         concept="Electrical Current",

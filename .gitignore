@@ -11,3 +11,4 @@ output/
 *.zip
 .DS_Store
 .streamlit/secrets.toml
+.pytest_cache/

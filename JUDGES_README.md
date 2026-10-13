@@ -39,8 +39,8 @@ On the `/login.html` screen, click either of the prominent instant access button
 | Traditional Approach | The Structural Flaw | The BHARATGURU Solution |
 |:---|:---|:---|
 | **Passive Video Lectures** | Students passively listen; comprehension drops after 4 minutes without active recall. | **Segmented Active Pedagogy**: Teaches in 60–90 word micro-segments, pausing for mandatory comprehension checkpoints. |
-| **Generic AI Chatbots** | Dump walls of unstructured text; when a student is wrong, they just repeat the answer. | **Misconception Engine™**: Diagnoses *why* the student erred (root cognitive fallacy) and dynamically pivots teaching strategy. |
-| **Western-Centric Examples** | Analogies use subways, baseball, snowstorms, and dollars that alienate Indian learners. | **Bharat Context Engine™**: Grounded in cricket spin, Mumbai local trains, Chandrayaan/ISRO, Kirana stores, and Rupees (₹). |
+| **Generic AI Chatbots** | Dump walls of unstructured text; when a student is wrong, they just repeat the answer. | **Misconception Engine**: Diagnoses *why* the student erred (root cognitive fallacy) and dynamically pivots teaching strategy. |
+| **Western-Centric Examples** | Analogies use subways, baseball, snowstorms, and dollars that alienate Indian learners. | **Bharat Context Engine**: Grounded in cricket spin, Mumbai local trains, Chandrayaan/ISRO, Kirana stores, and Rupees (₹). |
 | **Heavy GPU Requirements** | Talking head avatars require high-end NVIDIA CUDA cloud servers ($$$). | **Zero-GPU CPU Compositing**: Real-time amplitude-driven avatar video runs on commodity dual-core CPUs. |
 | **Language Barriers** | English-dominated interfaces leave non-English medium students behind. | **12 Indian Languages**: Native neural voice synthesis and script support across 12 languages + Hinglish. |
 
@@ -81,7 +81,7 @@ On the `/login.html` screen, click either of the prominent instant access button
 └───────────────┘                  └───────────────┘                   └───────────────┘
 ```
 
-### 1. Misconception Engine™ & Cognitive Fingerprinter (`src/misconception_engine.py`)
+### 1. Misconception Engine & Cognitive Fingerprinter (`src/misconception_engine.py`)
 Rather than binary right/wrong grading, the engine fingerprints cognitive root causes (e.g., conflating electric current with energy consumption, or assuming force is required to sustain steady motion). It prescribes targeted counterexamples and shifts pedagogical policy.
 
 ### 2. Hybrid RAG (Dense MiniLM + Sparse BM25 + RRF) (`src/hybrid_rag.py`)
@@ -93,7 +93,7 @@ Every generated explanation is cross-verified against the ingested source chunks
 ### 4. Pure-CPU Amplitude-Driven Avatar Video (`src/avatar.py`, `src/video.py`)
 Calculates RMS audio envelopes from synthesized speech to drive multi-state mouth animations at 24 FPS / 1080p, composited with subject-tinted presentation slides and progressive captions using OpenCV and PIL. Zero CUDA or GPU cloud dependency.
 
-### 5. Bharat 3D Lab™ Universal WebGL Visualizer (`src/model_3d.py`, `static/three_lab.js`)
+### 5. Bharat 3D Lab Universal WebGL Visualizer (`src/model_3d.py`, `static/three_lab.js`)
 Real-time interactive Three.js laboratory featuring procedural 3D STEM models: Human Eye Optics, DNA Double Helix, Bohr Atom, Electric Motor, Solar Orbits, Cardiovascular Hemodynamics, Plant Cell, and Prism Light Dispersion. Includes natural language procedural scene generation via `/api/3d/generate`.
 
 ### 6. Student Knowledge Graph & 5D Learning DNA (`src/knowledge_graph.py`, `src/learning_dna.py`)
@@ -148,7 +148,7 @@ Follow this sequence to experience the full end-to-end depth of BHARATGURU:
    * *"Current gets consumed and eaten up as it flows through the bulb."*
 4. **Observe the Misconception Engine in action**: The system detects the root fallacy (*"Conflation of charge flow with energy transfer"*), surfaces a counterexample (*"Both ammeters read identically"*), and dynamically pivots explanation style!
 
-### Step 4: Explore the Bharat 3D Lab™
+### Step 4: Explore the Bharat 3D Lab
 1. Click the **"3D Lab"** tab in the top navigation.
 2. Select any simulation (e.g., **Human Eye Optics**, **Solar Orbits**, or **DNA Double Helix**).
 3. Rotate, zoom, and inspect interactive anatomy and physics hotspots.
@@ -230,7 +230,7 @@ python scripts/test_credits_and_clean_state.py
 
 | Judging Criterion | BHARATGURU Implementation | Evidence |
 |:---|:---|:---|
-| **Technical Innovation** | Misconception Engine™ + Hybrid RAG (Dense + BM25 + RRF) + Zero-GPU Lip-Sync Video + Procedural WebGL 3D. | Inspect [`src/misconception_engine.py`](file:///c:/Users/pravi/OneDrive/Desktop/BHARAT_AI/src/misconception_engine.py) & [`src/hybrid_rag.py`](file:///c:/Users/pravi/OneDrive/Desktop/BHARAT_AI/src/hybrid_rag.py). |
+| **Technical Innovation** | Misconception Engine + Hybrid RAG (Dense + BM25 + RRF) + Zero-GPU Lip-Sync Video + Procedural WebGL 3D. | Inspect [`src/misconception_engine.py`](file:///c:/Users/pravi/OneDrive/Desktop/BHARAT_AI/src/misconception_engine.py) & [`src/hybrid_rag.py`](file:///c:/Users/pravi/OneDrive/Desktop/BHARAT_AI/src/hybrid_rag.py). |
 | **Completeness & Polish** | Full learning journey: Ingestion $\rightarrow$ Adaptive Teaching $\rightarrow$ 3D Lab $\rightarrow$ Quiz $\rightarrow$ Certificate $\rightarrow$ Teacher Dashboard. | Run live flow at [`http://localhost:8000`](http://localhost:8000). |
 | **Real-World Impact** | Built for 250M+ Indian students. Native mother tongues, culturally relevant anchors, runs on zero-GPU budget hardware. | 12 Indian languages, NEP 2020 pedagogical alignment. |
 | **Reliability & Resilience**| Cascading multi-provider LLM (Groq + NVIDIA + Gemini) + 100% offline fallback. Comprehensive automated test suite. | 7 automated test suites passing 100%. |

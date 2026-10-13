@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      LLM_MOCK: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      # The unit tests need only the light dependencies; the MiniLM / TTS / video stack
+      # (sentence-transformers, librosa, edge-tts ...) is exercised by scripts/ locally.
+      - name: Install test dependencies
+        run: pip install numpy pillow requests pypdf python-docx python-pptx fastapi python-multipart httpx pytest
+      - name: Every module compiles
+        run: python -m compileall -q src scripts tests server.py app.py config.py
+      - name: Unit tests
+        run: python -m pytest
