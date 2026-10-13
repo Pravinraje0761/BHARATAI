@@ -2,7 +2,7 @@
 
 Connects the Bharat Modern web interface to:
 - Student Knowledge Graph & Dependency Modeler
-- Misconception Engine™ & Cognitive Fingerprinter
+- Misconception Engine & Cognitive Fingerprinter
 - Adaptive Pedagogy Policy Selector & Socratic Engine
 - Bharat Context Engine
 - Hallucination Shield & Citation Grounding Verifier
@@ -1268,7 +1268,7 @@ def get_student_profile(
 
 
 # --------------------------------------------------------------------------- #
-# Bharat 3D Lab™ Endpoints (Interactive Three.js Science Models)
+# Bharat 3D Lab Endpoints (Interactive Three.js Science Models)
 # --------------------------------------------------------------------------- #
 @app.get("/api/3d/model")
 def get_3d_model_spec(concept: str = "dna"):
