@@ -1,5 +1,5 @@
 /**
- * Bharat 3D Lab™ - Interactive WebGL Science Visualizer
+ * Bharat 3D Lab - Interactive WebGL Science Visualizer
  * Powered by Three.js
  * Renders interactive DNA Double Helix, Bohr Atom, Electric Motor, and Solar System
  */

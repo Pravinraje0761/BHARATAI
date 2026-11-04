@@ -73,6 +73,13 @@ class AuthStore:
         self.conn = sqlite3.connect(str(self.path), check_same_thread=False)
         self.conn.row_factory = sqlite3.Row
         self.conn.executescript(_AUTH_SCHEMA)
+        # The demo seed below also writes to the knowledge-graph and sessions tables,
+        # which other stores normally create. Create them here too (IF NOT EXISTS), so a
+        # fresh database does not fail with "no such table" depending on startup order.
+        from src.knowledge_graph import _KG_SCHEMA
+        from src.profile_store import _SCHEMA as _PROFILE_SCHEMA
+        self.conn.executescript(_KG_SCHEMA)
+        self.conn.executescript(_PROFILE_SCHEMA)
         self.conn.commit()
         self._seed_default_accounts()
 

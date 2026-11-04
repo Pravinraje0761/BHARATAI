@@ -1,4 +1,4 @@
-"""Bharat 3D Lab™ - Universal Procedural 3D Science Model Engine for BHARATGURU.
+"""Bharat 3D Lab - Universal Procedural 3D Science Model Engine for BHARATGURU.
 
 Generates and provisions interactive WebGL 3D models (Human Eye, DNA Double Helix, Bohr Atom,
 Electric Motor, Solar Orbit, Heart, Plant Cell, Light Dispersion Prism, Molecules, Organelles)
